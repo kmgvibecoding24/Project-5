@@ -1,0 +1,1573 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Учёт ИТ-активов</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --primary:#1F3A5F; --primary-h:#2E5A8A; --bg:#F5F7FA; --surface:#FFFFFF; --text:#1F2933; --muted:#6B7280;
+  --border:#E5E7EB; --success:#2F855A; --warn:#B7791F; --danger:#C53030; --neutral:#4A5568;
+  --success-bg:#E8F3EC; --warn-bg:#FBF3E2; --danger-bg:#FCECEC; --neutral-bg:#EDF0F4; --primary-bg:#E8EEF6;
+  --hover:#F3F6FA; --r:6px; --r-sm:4px;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:400 14px/1.5 Inter,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+h2{font-size:20px;font-weight:600;margin:0}
+h3{font-size:16px;font-weight:600;margin:0}
+h4{font-size:14px;font-weight:600;margin:24px 0 8px}
+a{color:var(--primary)}
+.mono,.num,td,th{font-variant-numeric:tabular-nums}
+.mono{font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;font-size:13px;letter-spacing:.02em}
+.muted{color:var(--muted)}
+.ic{flex:none;vertical-align:-3px}
+:focus-visible{outline:2px solid var(--primary-h);outline-offset:2px}
+
+/* ---------- Header ---------- */
+.topbar{position:sticky;top:0;z-index:30;background:var(--surface);border-bottom:1px solid var(--border)}
+.topbar-in{max-width:1440px;margin:0 auto;padding:0 24px;height:56px;display:flex;align-items:center;gap:24px}
+.brand{display:flex;align-items:center;gap:8px;font-weight:600;font-size:16px;color:var(--text);text-decoration:none;white-space:nowrap}
+.logo{width:32px;height:32px;border-radius:var(--r);background:var(--primary);color:#fff;display:grid;place-items:center}
+.nav{display:flex;gap:4px}
+.nav a,.nav button{font:inherit;font-weight:500;color:var(--neutral);text-decoration:none;padding:8px 12px;border-radius:var(--r);border:0;background:none;cursor:pointer}
+.nav a:hover,.nav button:hover{background:var(--hover);color:var(--primary)}
+.gsearch{position:relative;margin-left:auto;width:320px;max-width:100%}
+.gsearch .ic{position:absolute;left:10px;top:10px;color:var(--muted)}
+.gsearch input{width:100%;padding-left:32px}
+.gres{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:0 8px 24px rgba(31,41,51,.12);z-index:40;max-height:360px;overflow:auto}
+.gres button{display:block;width:100%;text-align:left;border:0;background:none;padding:8px 12px;font:inherit;cursor:pointer;border-bottom:1px solid var(--border)}
+.gres button:last-child{border-bottom:0}
+.gres button:hover,.gres button:focus{background:var(--hover)}
+.gres .empty{padding:12px;color:var(--muted)}
+.profile{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--primary-bg);color:var(--primary);display:grid;place-items:center;font-weight:600;font-size:12px}
+.pname{font-weight:500;font-size:13px}
+
+/* ---------- Layout ---------- */
+.wrap{max-width:1440px;margin:0 auto;padding:24px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-top:24px;scroll-margin-top:72px}
+.sec-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+.sec-actions{display:flex;gap:8px;flex-wrap:wrap}
+
+/* ---------- Controls ---------- */
+input,select,textarea{font:inherit;color:var(--text);background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:7px 10px;min-height:36px}
+textarea{resize:vertical;min-height:72px}
+input:hover,select:hover,textarea:hover{border-color:#CBD2DA}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary-h);box-shadow:0 0 0 3px rgba(46,90,138,.15)}
+input[aria-invalid=true],select[aria-invalid=true],textarea[aria-invalid=true]{border-color:var(--danger)}
+input:disabled{background:var(--bg);color:var(--muted)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font:inherit;font-weight:500;border-radius:var(--r-sm);padding:7px 14px;min-height:36px;cursor:pointer;border:1px solid transparent;white-space:nowrap;text-decoration:none}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-h)}
+.btn-secondary{background:var(--surface);color:var(--primary);border-color:#C9D3DF}
+.btn-secondary:hover{border-color:var(--primary-h);background:var(--hover)}
+.btn-text{background:none;color:var(--primary);padding:7px 8px}
+.btn-text:hover{background:var(--hover)}
+.btn-danger{background:var(--surface);color:var(--danger);border-color:#EBC4C4}
+.btn-danger:hover{background:var(--danger-bg)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn-sm{min-height:32px;padding:5px 10px;font-size:13px}
+.icon-btn{display:inline-grid;place-items:center;width:32px;height:32px;border-radius:var(--r-sm);border:0;background:none;color:var(--neutral);cursor:pointer}
+.icon-btn:hover{background:var(--hover);color:var(--primary)}
+.chk{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+.chk input{min-height:0;width:16px;height:16px;margin:0;accent-color:var(--primary)}
+
+/* ---------- KPI ---------- */
+.kpi{display:grid;gap:16px}
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
+.kpi-row.warn{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.kpi-card{font:inherit;text-align:left;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;cursor:pointer;display:flex;flex-direction:column;gap:2px;color:var(--text)}
+.kpi-card:hover{border-color:#C9D3DF}
+.kpi-card.active{border-color:var(--primary);box-shadow:inset 0 0 0 1px var(--primary)}
+.kpi-card .k-label{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.kpi-card .k-val{font-size:24px;font-weight:600;line-height:1.2}
+.kpi-card .dot{width:8px;height:8px;border-radius:50%;flex:none}
+.kpi-card.alert{flex-direction:row;align-items:center;gap:12px}
+.kpi-card.alert .k-ic{width:36px;height:36px;border-radius:var(--r);display:grid;place-items:center;background:var(--warn-bg);color:var(--warn);flex:none}
+.kpi-card.alert.zero .k-ic{background:var(--neutral-bg);color:var(--neutral)}
+.kpi-card.alert .k-val{font-size:20px}
+
+/* ---------- Toolbar & filters ---------- */
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.toolbar .search{flex:1 1 280px;position:relative}
+.toolbar .search input{width:100%;padding-left:32px}
+.toolbar .search .ic{position:absolute;left:10px;top:10px;color:var(--muted)}
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.filters select{max-width:200px}
+.filt-toggle{display:none}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.chip{display:inline-flex;align-items:center;gap:4px;background:var(--primary-bg);color:var(--primary);border-radius:999px;padding:2px 4px 2px 10px;font-size:12px;font-weight:500}
+.chip button{border:0;background:none;color:inherit;cursor:pointer;display:grid;place-items:center;width:20px;height:20px;border-radius:50%}
+.chip button:hover{background:rgba(31,58,95,.1)}
+.reg-meta{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:16px 0 8px;font-size:13px;color:var(--muted);flex-wrap:wrap}
+.bulk{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--primary-bg);border-radius:var(--r);padding:8px 12px;margin-bottom:8px}
+.bulk b{margin-right:8px}
+
+/* ---------- Tables ---------- */
+.table-wrap{overflow:auto;border:1px solid var(--border);border-radius:var(--r)}
+.reg-wrap{max-height:640px}
+.tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
+.tbl th{position:sticky;top:0;z-index:2;background:#F9FAFB;text-align:left;font-weight:600;font-size:12px;color:var(--neutral);padding:10px 12px;border-bottom:1px solid var(--border);white-space:nowrap}
+.tbl td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+.tbl tbody tr:last-child td{border-bottom:0}
+.tbl tbody tr[data-open]{cursor:pointer}
+.tbl tbody tr:hover td{background:var(--hover)}
+.tbl .num{text-align:right;white-space:nowrap}
+.tbl .r{text-align:right}
+.tbl .c-chk{width:36px;padding-right:0}
+.tbl .c-act{width:44px;padding:4px 8px;text-align:right}
+.tbl td.c-name{min-width:220px}
+.th-sort{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
+.th-sort:hover{color:var(--primary)}
+.th-sort .arr{opacity:.35}
+.th-sort[data-active] .arr{opacity:1;color:var(--primary)}
+.sub{font-size:12px;color:var(--muted)}
+.empty{padding:32px;text-align:center;color:var(--muted)}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:500;white-space:nowrap}
+.badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.b-success{background:var(--success-bg);color:var(--success)}
+.b-warn{background:var(--warn-bg);color:#8A5A12}
+.b-danger{background:var(--danger-bg);color:var(--danger)}
+.b-neutral{background:var(--neutral-bg);color:var(--neutral)}
+.b-accent{background:var(--primary-bg);color:var(--primary)}
+.b-muted{background:#F1F2F4;color:var(--muted)}
+.tag{display:inline-block;font-size:11px;font-weight:500;padding:0 6px;border-radius:var(--r-sm);margin-left:4px;white-space:nowrap}
+.tag-warn{background:var(--warn-bg);color:#8A5A12}
+.tag-danger{background:var(--danger-bg);color:var(--danger)}
+.nd{background:#FEF3C7;color:#8A5A12;padding:1px 6px;border-radius:var(--r-sm);font-size:12px;font-weight:500;white-space:nowrap}
+.amort0{color:var(--muted)}
+.amort6{color:var(--warn);font-weight:500}
+.dotted{border-bottom:1px dotted var(--muted);cursor:help}
+.pager{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:16px;flex-wrap:wrap;font-size:13px}
+.pager .pg{display:flex;align-items:center;gap:8px}
+.reg-cards{display:none;gap:8px}
+.a-card{border:1px solid var(--border);border-radius:var(--r);padding:12px;display:grid;gap:4px;cursor:pointer;background:var(--surface)}
+.a-card .top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.a-card .nm{font-weight:500}
+
+/* ---------- Menu ---------- */
+.menu{position:fixed;z-index:60;min-width:220px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:0 8px 24px rgba(31,41,51,.14);padding:4px}
+.menu button{display:flex;gap:8px;align-items:center;width:100%;text-align:left;border:0;background:none;font:inherit;padding:8px 12px;border-radius:var(--r-sm);cursor:pointer;color:var(--text)}
+.menu button:hover,.menu button:focus{background:var(--hover);outline:none}
+.menu hr{border:0;border-top:1px solid var(--border);margin:4px 0}
+.menu .mh{font-size:11px;color:var(--muted);padding:4px 12px;text-transform:uppercase;letter-spacing:.04em}
+
+/* ---------- Drawer ---------- */
+.overlay{position:fixed;inset:0;background:rgba(31,41,51,.28);z-index:40}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:560px;max-width:100%;background:var(--surface);z-index:45;display:flex;flex-direction:column;border-left:1px solid var(--border);box-shadow:-8px 0 24px rgba(31,41,51,.12)}
+.dr-h{display:flex;justify-content:space-between;gap:16px;padding:16px 24px;border-bottom:1px solid var(--border)}
+.dr-h h3{margin:4px 0 8px}
+.dr-inv{color:var(--muted)}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);padding:0 24px;overflow-x:auto}
+.tabs button{font:inherit;font-weight:500;border:0;background:none;padding:10px 12px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.tabs button[aria-selected=true]{color:var(--primary);border-bottom-color:var(--primary)}
+.dr-b{flex:1;overflow:auto;padding:24px}
+.dr-f{border-top:1px solid var(--border);padding:12px 24px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.dl{display:grid;grid-template-columns:200px 1fr;gap:8px 16px;margin:0 0 8px}
+.dl dt{color:var(--muted);font-size:13px}
+.dl dd{margin:0}
+.tl{list-style:none;margin:0;padding:0}
+.tl li{position:relative;padding:0 0 20px 24px;border-left:1px solid var(--border);margin-left:6px}
+.tl li:last-child{border-left-color:transparent}
+.tl li::before{content:"";position:absolute;left:-6px;top:4px;width:11px;height:11px;border-radius:50%;background:var(--surface);border:2px solid var(--primary)}
+.tl li.storno::before{border-color:var(--danger)}
+.tl li.audit::before{border-color:#CBD2DA}
+.tl .t-h{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tl .t-date{font-weight:600}
+.tl .t-line{font-size:13px;color:var(--neutral);margin-top:2px}
+.tl .t-meta{font-size:12px;color:var(--muted);margin-top:4px}
+.tl .cancelled .t-op{text-decoration:line-through;color:var(--muted)}
+
+/* ---------- Modal ---------- */
+.modal-back{position:fixed;inset:0;background:rgba(31,41,51,.36);z-index:50;display:grid;place-items:center;padding:16px}
+.modal{background:var(--surface);border-radius:var(--r);width:560px;max-width:100%;max-height:calc(100vh - 32px);display:flex;flex-direction:column;box-shadow:0 16px 48px rgba(31,41,51,.2)}
+.modal.wide{width:880px}
+.modal-h{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:16px 24px;border-bottom:1px solid var(--border)}
+.modal-sub{font-size:13px;color:var(--muted);margin-top:4px;line-height:1.6}
+.modal-b{padding:24px;overflow:auto}
+.modal-f{display:flex;justify-content:flex-end;gap:8px;padding:12px 24px;border-top:1px solid var(--border);flex-wrap:wrap}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-grid.one{grid-template-columns:1fr}
+.fld{display:flex;flex-direction:column;gap:4px;min-width:0}
+.fld.full{grid-column:1/-1}
+.fld>label{font-size:12px;font-weight:500;color:var(--neutral)}
+.fld .req{color:var(--danger);margin-left:2px}
+.ferr{font-size:12px;color:var(--danger);min-height:0}
+.ferr:empty{display:none}
+.hint{font-size:12px;color:var(--muted)}
+.op-flow{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.note{background:var(--bg);border-radius:var(--r);padding:12px;font-size:13px;color:var(--neutral);margin-bottom:16px}
+.note.warn{background:var(--warn-bg);color:#6B470E}
+
+/* ---------- Report ---------- */
+.rp-controls{display:grid;gap:12px}
+.rp-row{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
+.rp-row .lbl{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:500;color:var(--neutral)}
+.presets{display:flex;gap:4px;flex-wrap:wrap}
+.presets button{font:inherit;font-size:13px;border:1px solid var(--border);background:var(--surface);border-radius:999px;padding:5px 12px;cursor:pointer;color:var(--neutral);min-height:32px}
+.presets button:hover{border-color:var(--primary-h);color:var(--primary)}
+.presets button[aria-pressed=true]{background:var(--primary-bg);border-color:var(--primary-bg);color:var(--primary);font-weight:500}
+.rp-row select{max-width:220px}
+.msel{position:relative}
+.msel-btn{max-width:260px;justify-content:space-between;color:var(--text);font-weight:400}
+.msel-btn span{overflow:hidden;text-overflow:ellipsis}
+.msel-panel{position:absolute;top:calc(100% + 4px);left:0;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:0 8px 24px rgba(31,41,51,.12);padding:8px;min-width:260px;max-height:320px;overflow:auto;display:grid;gap:2px}
+.msel-panel .chk{padding:6px 8px;border-radius:var(--r-sm);font-size:13px}
+.msel-panel .chk:hover{background:var(--hover)}
+.msel-foot{display:flex;justify-content:space-between;border-top:1px solid var(--border);padding-top:4px;margin-top:4px}
+.rp-bar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin:24px 0 8px}
+.rp-meta{font-size:13px;color:var(--muted)}
+.rp-exports{display:flex;gap:8px;flex-wrap:wrap}
+.err{color:var(--danger);font-size:13px}
+.err:empty{display:none}
+.rp-wrap{max-height:70vh}
+.rp-wrap .tbl td{white-space:nowrap}
+.rp-wrap .tbl td.wrap{white-space:normal;min-width:200px}
+.tbl tr.cancelled td{color:var(--muted)}
+.empty-box{border:1px dashed #CBD2DA;border-radius:var(--r);padding:32px;text-align:center;color:var(--muted)}
+.totals{margin-top:24px;border-top:1px solid var(--border);padding-top:16px}
+.tot-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}
+.tot{border:1px solid var(--border);border-radius:var(--r);padding:12px 16px}
+.tot .t-l{font-size:12px;color:var(--muted)}
+.tot .t-v{font-size:18px;font-weight:600}
+.tot .t-s{font-size:12px;color:var(--neutral)}
+.tot-check{margin-top:8px;font-size:13px;display:flex;gap:6px;align-items:center}
+.tot-check.ok{color:var(--success)}
+.tot-check.bad{color:var(--danger)}
+
+/* ---------- Directories ---------- */
+.dict-add{display:flex;gap:8px;margin:16px 0}
+.dict-add input{flex:1}
+.inline-inp{width:100%;border-color:transparent;background:transparent}
+.inline-inp:hover{border-color:var(--border)}
+.emp-form{border:1px solid var(--border);border-radius:var(--r);padding:16px;margin:16px 0}
+.row-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+.set-block{border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-top:16px}
+.set-block p{margin:4px 0 12px;color:var(--muted);font-size:13px}
+
+/* ---------- Toasts ---------- */
+.toasts{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:70;display:grid;gap:8px}
+.toast{background:var(--text);color:#fff;padding:10px 16px;border-radius:var(--r);font-size:13px;box-shadow:0 8px 24px rgba(31,41,51,.2);display:flex;gap:8px;align-items:center}
+.toast.err{background:var(--danger)}
+
+/* ---------- Printable document (print & PDF) ---------- */
+#printArea{display:none}
+.print-doc{font:11px/1.4 Inter,Arial,sans-serif;color:#111;background:#fff}
+.print-doc .pd-org{font-weight:600;font-size:13px}
+.print-doc h1{font-size:16px;margin:8px 0 4px}
+.print-doc .pd-meta{color:#444;margin-bottom:12px}
+.print-doc table{width:100%;border-collapse:collapse}
+.print-doc th,.print-doc td{border:1px solid #9CA3AF;padding:4px 5px;text-align:left;vertical-align:top}
+.print-doc th{background:#EEF1F5;font-weight:600}
+.print-doc tr{page-break-inside:avoid}
+.print-doc .pd-tot{margin-top:12px;border-collapse:collapse;width:auto;min-width:50%}
+.print-doc .pd-empty{padding:16px;border:1px dashed #999;text-align:center}
+.print-doc .pd-sign{margin-top:32px;display:flex;gap:48px;flex-wrap:wrap}
+.print-doc .pd-sign span{display:inline-block;border-bottom:1px solid #111;min-width:200px;margin-left:8px}
+.pdf-doc{width:1060px;padding:8px}
+@media print{
+  @page{size:A4 landscape;margin:12mm}
+  body{background:#fff}
+  body.print-mode>*:not(#printArea){display:none!important}
+  body.print-mode #printArea{display:block}
+  .topbar,.drawer,.overlay,.modal-back,.toasts,.menu{display:none!important}
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width:1279px){
+  .filt-toggle{display:inline-flex}
+  .filters{display:none;width:100%;padding:8px 0}
+  .filters.open{display:flex}
+  .filters select{flex:1 1 180px;max-width:none}
+  .pname{display:none}
+}
+@media (max-width:900px){
+  .topbar-in{height:auto;flex-wrap:wrap;padding:8px 16px;gap:8px 16px}
+  .gsearch{order:3;width:100%}
+  .card{scroll-margin-top:120px}
+}
+@media (max-width:767px){
+  .wrap{padding:16px}
+  .card{padding:16px;margin-top:16px}
+  .reg-wrap{display:none}
+  .reg-cards{display:grid}
+  .nav a,.nav button{padding:6px 8px}
+  .form-grid{grid-template-columns:1fr}
+  .dl{grid-template-columns:1fr;gap:0 0}
+  .dl dd{margin-bottom:8px}
+  .drawer{width:100%}
+  .dr-h,.dr-b,.dr-f{padding-left:16px;padding-right:16px}
+  .tabs{padding:0 16px}
+  .modal-b{padding:16px}
+  .rp-row select,.rp-row .lbl,.rp-row .msel,.rp-row .msel-btn{flex:1 1 100%;max-width:none;width:100%}
+  .kpi-card .k-val{font-size:20px}
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="#top"><span class="logo" id="logoIc"></span><span>Учёт ИТ-активов</span></a>
+    <nav class="nav" aria-label="Разделы">
+      <a href="#registry">Реестр</a>
+      <a href="#report">Отчёт</a>
+      <button type="button" id="navDirs">Справочники</button>
+    </nav>
+    <div class="gsearch" role="search">
+      <span id="gIc"></span>
+      <input id="gq" type="search" autocomplete="off" placeholder="Инвентарный или серийный номер" aria-label="Глобальный поиск по инвентарному и серийному номеру">
+      <div id="gres" class="gres" hidden></div>
+    </div>
+    <div class="profile" title="Текущий пользователь"><span class="avatar">МА</span><span class="pname">Менеджер по активам</span></div>
+  </div>
+</header>
+
+<main class="wrap" id="top">
+  <section id="kpi" class="kpi" aria-label="Ключевые показатели"></section>
+
+  <section id="registry" class="card" aria-labelledby="regTitle">
+    <div class="sec-head">
+      <h2 id="regTitle">Реестр активов</h2>
+      <div class="sec-actions"><button class="btn btn-primary" id="btnNew" type="button"></button></div>
+    </div>
+    <div class="toolbar">
+      <div class="search"><span id="rqIc"></span><input id="rq" type="search" placeholder="Поиск: инв. №, наименование, серийный номер, модель" aria-label="Поиск по реестру"></div>
+      <button class="btn btn-secondary filt-toggle" id="filtToggle" type="button" aria-expanded="false" aria-controls="filters"></button>
+      <div class="filters" id="filters">
+        <select id="fCat" aria-label="Категория"></select>
+        <select id="fStatus" aria-label="Статус"></select>
+        <select id="fMol" aria-label="МОЛ"></select>
+        <select id="fDept" aria-label="Подразделение"></select>
+        <select id="fLoc" aria-label="Локация"></select>
+        <button class="btn btn-text" id="fReset" type="button">Сбросить</button>
+      </div>
+    </div>
+    <div id="chips" class="chips"></div>
+    <div class="reg-meta"><span id="regCount"></span><span class="hint">Клик по строке открывает карточку актива</span></div>
+    <div id="bulk" class="bulk" hidden></div>
+    <div class="table-wrap reg-wrap">
+      <table class="tbl" id="regTable">
+        <thead id="regHead"></thead>
+        <tbody id="regBody"></tbody>
+      </table>
+    </div>
+    <div id="regCards" class="reg-cards"></div>
+    <div class="pager" id="pager"></div>
+  </section>
+
+  <section id="report" class="card" aria-labelledby="rpTitle">
+    <div class="sec-head"><h2 id="rpTitle">Отчёт по движению активов</h2></div>
+    <div class="rp-controls">
+      <div class="rp-row">
+        <label class="lbl">Дата с<input type="date" id="rpFrom"></label>
+        <label class="lbl">Дата по<input type="date" id="rpTo"></label>
+        <div class="presets" role="group" aria-label="Быстрый выбор периода">
+          <button type="button" data-preset="month">Текущий месяц</button>
+          <button type="button" data-preset="prev">Прошлый месяц</button>
+          <button type="button" data-preset="quarter">Квартал</button>
+          <button type="button" data-preset="year">Год</button>
+        </div>
+        <button class="btn btn-primary" id="rpGo" type="button">Сформировать</button>
+      </div>
+      <div class="rp-row">
+        <div id="rpTypes" class="msel"></div>
+        <div id="rpMols" class="msel"></div>
+        <select id="rpDept" aria-label="Подразделение"></select>
+        <select id="rpLoc" aria-label="Локация"></select>
+        <select id="rpCat" aria-label="Категория оборудования"></select>
+        <select id="rpDepr" aria-label="Оставшийся срок амортизации">
+          <option value="all">Остаток амортизации: все</option>
+          <option value="le6">Остаток ≤ 6 мес.</option>
+          <option value="le12">Остаток ≤ 12 мес.</option>
+          <option value="zero">Полностью самортизированные</option>
+        </select>
+        <div id="rpCols" class="msel"></div>
+      </div>
+      <div id="rpErr" class="err" role="alert"></div>
+    </div>
+    <div class="rp-bar">
+      <div class="rp-meta" id="rpMeta"></div>
+      <div class="rp-exports">
+        <button class="btn btn-secondary btn-sm" id="exXlsx" type="button"></button>
+        <button class="btn btn-secondary btn-sm" id="exPdf" type="button"></button>
+        <button class="btn btn-secondary btn-sm" id="exCsv" type="button"></button>
+        <button class="btn btn-secondary btn-sm" id="exPrint" type="button"></button>
+      </div>
+    </div>
+    <div id="rpOut"></div>
+  </section>
+</main>
+
+<div id="overlay" class="overlay" hidden></div>
+<aside id="drawer" class="drawer" hidden role="dialog" aria-modal="true" aria-label="Карточка актива"></aside>
+<div id="modalRoot"></div>
+<div id="menu" class="menu" hidden role="menu"></div>
+<div id="toasts" class="toasts" aria-live="polite"></div>
+<div id="printArea"></div>
+
+<script>
+'use strict';
+/* =====================================================================
+   Учёт ИТ-активов — одностраничное приложение (реализация PRD v1.3)
+   Данные хранятся в localStorage браузера.
+   ===================================================================== */
+const LS_KEY = 'itam_v1';
+const USER = 'Менеджер по активам';
+const XLSX_URL = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+const H2P_URL = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+
+/* ---------- Утилиты ---------- */
+const $ = s => document.querySelector(s);
+const pad = n => String(n).padStart(2, '0');
+const toISO = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const TODAY = toISO(new Date());
+const parseISO = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+const addDays = (s, n) => { const d = parseISO(s); d.setDate(d.getDate() + n); return toISO(d); };
+const addMonths = (s, n) => {
+  const d = parseISO(s), day = d.getDate(); d.setDate(1); d.setMonth(d.getMonth() + n);
+  const last = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate(); d.setDate(Math.min(day, last)); return toISO(d);
+};
+const firstOfNextMonth = s => { const d = parseISO(s); return toISO(new Date(d.getFullYear(), d.getMonth() + 1, 1)); };
+const monthsFull = (a, b) => {
+  const [ay, am, ad] = a.split('-').map(Number), [by, bm, bd] = b.split('-').map(Number);
+  let m = (by - ay) * 12 + (bm - am); if (bd < ad) m--; return m;
+};
+const fmtD = s => s ? s.split('-').reverse().join('.') : '—';
+const NF = new Intl.NumberFormat('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const fmtMoney = n => (n == null || n === '' || isNaN(+n)) ? '—' : NF.format(+n) + ' ₸';
+const fmtMonths = n => { if (n < 12) return `${n} мес.`; const y = Math.floor(n / 12), m = n % 12; return `${n} мес. (${y} г.${m ? ' ' + m + ' мес.' : ''})`; };
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const uid = () => (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : 'id-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+const nowStamp = () => { const d = new Date(); return `${toISO(d)}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`; };
+const fmtStamp = s => s ? `${fmtD(s.slice(0, 10))} ${s.slice(11, 16)}` : '';
+
+const ICONS = {
+  search: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+  plus: '<path d="M5 12h14"/><path d="M12 5v14"/>',
+  x: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+  more: '<circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>',
+  chevL: '<path d="m15 18-6-6 6-6"/>', chevR: '<path d="m9 18 6-6-6-6"/>', chevD: '<path d="m6 9 6 6 6-6"/>',
+  alert: '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+  shield: '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="M12 8v4"/><path d="M12 16h.01"/>',
+  userX: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m17 8 5 5"/><path d="m22 8-5 5"/>',
+  clock: '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+  sheet: '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M8 13h2"/><path d="M14 13h2"/><path d="M8 17h2"/><path d="M14 17h2"/>',
+  file: '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>',
+  printer: '<path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"/><rect x="6" y="14" width="12" height="8" rx="1"/>',
+  download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/>',
+  filter: '<path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/>',
+  undo: '<path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>',
+  laptop: '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M2 20h20"/>',
+  check: '<path d="M20 6 9 17l-5-5"/>',
+  arrow: '<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
+  sort: '<path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/>',
+  columns: '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/><path d="M15 3v18"/>'
+};
+const icon = (n, s = 16) => `<svg class="ic" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n] || ''}</svg>`;
+
+/* ---------- Справочные константы ---------- */
+const STATUSES = {
+  received: { label: 'Поступил', cls: 'b-accent', color: '#1F3A5F' },
+  stock: { label: 'На складе', cls: 'b-neutral', color: '#4A5568' },
+  use: { label: 'В эксплуатации', cls: 'b-success', color: '#2F855A' },
+  repair: { label: 'В ремонте', cls: 'b-warn', color: '#B7791F' },
+  reserve: { label: 'В резерве', cls: 'b-neutral', color: '#8592A3' },
+  writtenoff: { label: 'Списан', cls: 'b-danger', color: '#C53030' },
+  disposed: { label: 'Утилизирован', cls: 'b-muted', color: '#9CA3AF' }
+};
+const STATUS_ORDER = Object.keys(STATUSES);
+const ON_BOOKS = ['stock', 'use', 'repair', 'reserve'];
+const CLOSED = ['writtenoff', 'disposed'];
+const OPS = {
+  register: { label: 'Регистрация поступления', from: [] },
+  accept: { label: 'Принятие к учёту', from: ['received'], to: 'stock' },
+  issue: { label: 'Выдача', from: ['stock', 'reserve'], to: 'use' },
+  move: { label: 'Перемещение', from: ['use'], to: 'use' },
+  return: { label: 'Возврат на склад', from: ['use', 'repair'], to: 'stock' },
+  repair: { label: 'Отправка в ремонт', from: ['use', 'stock'], to: 'repair' },
+  fromRepair: { label: 'Возврат из ремонта', from: ['repair'], to: null },
+  reserve: { label: 'Перевод в резерв', from: ['stock', 'use'], to: 'reserve' },
+  writeoff: { label: 'Списание', from: ['received', 'stock', 'use', 'repair', 'reserve'], to: 'writtenoff' },
+  dispose: { label: 'Утилизация', from: ['writtenoff'], to: 'disposed' },
+  storno: { label: 'Сторно', from: [] }
+};
+const USER_OPS = ['accept', 'issue', 'move', 'return', 'repair', 'fromRepair', 'reserve', 'writeoff', 'dispose'];
+const INTERNAL = ['issue', 'move', 'return', 'repair', 'fromRepair', 'reserve'];
+const allowedOps = a => USER_OPS.filter(o => OPS[o].from.includes(a.status));
+const badge = s => s ? `<span class="badge ${STATUSES[s].cls}">${STATUSES[s].label}</span>` : '—';
+
+/* ---------- Хранилище ---------- */
+let S = null, CACHE = null;
+function load() {
+  try { const raw = localStorage.getItem(LS_KEY); if (raw) { S = JSON.parse(raw); if (S && Array.isArray(S.assets)) { S.audit = S.audit || []; return; } } } catch (e) { }
+  seed(); save();
+}
+function save() { CACHE = null; try { localStorage.setItem(LS_KEY, JSON.stringify(S)); } catch (e) { } }
+
+function idx() {
+  if (CACHE) return CACHE;
+  const c = {
+    emp: new Map(S.employees.map(x => [x.id, x])), loc: new Map(S.locations.map(x => [x.id, x])),
+    cat: new Map(S.categories.map(x => [x.id, x])), dept: new Map(S.departments.map(x => [x.id, x])),
+    reason: new Map(S.reasons.map(x => [x.id, x])), asset: new Map(S.assets.map(x => [x.id, x])),
+    stornoed: new Set(), mov: new Map(), eff: new Map()
+  };
+  for (const m of S.movements) if (m.storno_of) c.stornoed.add(m.storno_of);
+  c.sorted = [...S.movements].sort((a, b) => a.operation_date < b.operation_date ? -1 : a.operation_date > b.operation_date ? 1 : a.seq - b.seq);
+  for (const m of c.sorted) {
+    if (!c.mov.has(m.asset_id)) { c.mov.set(m.asset_id, []); c.eff.set(m.asset_id, []); }
+    c.mov.get(m.asset_id).push(m);
+    if (m.operation_type !== 'storno' && !c.stornoed.has(m.id)) c.eff.get(m.asset_id).push(m);
+  }
+  CACHE = c; return c;
+}
+const emp = id => idx().emp.get(id);
+const empFio = id => { const e = emp(id); return e ? e.fio : '—'; };
+const empShort = id => { const e = emp(id); if (!e) return '—'; const [f, i, o] = e.fio.split(' '); return `${f}${i ? ' ' + i[0] + '.' : ''}${o ? ' ' + o[0] + '.' : ''}`; };
+const empFull = id => { const e = emp(id); return e ? `${e.fio}${e.position ? ', ' + e.position : ''}` : '—'; };
+const locName = id => { const l = idx().loc.get(id); return l ? l.name : '—'; };
+const catName = id => { const l = idx().cat.get(id); return l ? l.name : '—'; };
+const deptName = id => { const l = idx().dept.get(id); return l ? l.name : '—'; };
+const whMol = () => (S.employees.find(e => e.active && e.isMol && e.dept === 'd5') || S.employees.find(e => e.active && e.isMol) || {}).id || '';
+const whLoc = () => (S.locations[0] || {}).id || '';
+const effMovs = a => idx().eff.get(a.id) || [];
+const lastEffDate = a => { const e = effMovs(a); return e.length ? e[e.length - 1].operation_date : null; };
+const regDate = a => { const r = (idx().mov.get(a.id) || []).find(m => m.operation_type === 'register'); return r ? r.operation_date : null; };
+function statusAt(id, d) { let s = null; for (const m of (idx().eff.get(id) || [])) { if (m.operation_date > d) break; s = m.status_to; } return s; }
+function nextInv() { let mx = 0; for (const a of S.assets) { const n = parseInt(a.inventory_number, 10); if (n > mx) mx = n; } return String(mx + 1).padStart(8, '0'); }
+function invError(inv, selfId) {
+  if (!/^\d{8}$/.test(inv || '')) return 'Ровно 8 цифр, например 00000123';
+  if (S.assets.some(x => x.inventory_number === inv && x.id !== selfId)) return 'Инвентарный номер уже используется';
+  return '';
+}
+
+/* ---------- Операции жизненного цикла ---------- */
+const snapshot = a => ({
+  status: a.status, responsible_person: a.responsible_person, location: a.location, inventory_number: a.inventory_number,
+  accounting_date: a.accounting_date, depreciation_start_date: a.depreciation_start_date, useful_life_months: a.useful_life_months
+});
+function applyOp(a, op, v, createdAt) {
+  const m = {
+    id: uid(), seq: ++S.seq, asset_id: a.id, operation_type: op, operation_date: v.date,
+    status_from: op === 'register' ? null : a.status, status_to: null,
+    mol_from: a.responsible_person || null, location_from: a.location || null,
+    document_ref: '', comment: '', created_by: USER, created_at: createdAt || nowStamp(), prev: snapshot(a)
+  };
+  let to = OPS[op].to;
+  switch (op) {
+    case 'register': to = 'received'; m.document_ref = v.doc || ''; m.comment = 'Регистрация поступившего оборудования'; break;
+    case 'accept':
+      a.inventory_number = v.inv; a.accounting_date = v.date; a.responsible_person = v.mol; if (v.loc) a.location = v.loc;
+      if (v.spi) a.useful_life_months = +v.spi; a.depreciation_start_date = firstOfNextMonth(v.date); a.depr_start_reason = '';
+      m.document_ref = v.doc; break;
+    case 'issue': a.responsible_person = v.mol; a.location = v.loc; m.document_ref = v.doc || ''; break;
+    case 'move': if (v.mol) a.responsible_person = v.mol; if (v.loc) a.location = v.loc; m.document_ref = v.doc; break;
+    case 'return': a.responsible_person = v.mol; if (v.loc) a.location = v.loc; m.comment = 'Состояние: ' + v.cond; break;
+    case 'repair': m.comment = `Исполнитель: ${v.service}. Неисправность: ${v.fault}`; break;
+    case 'fromRepair': to = v.target; if (v.mol) a.responsible_person = v.mol; if (v.target === 'stock' && v.loc) a.location = v.loc; m.comment = 'Результат ремонта: ' + v.result; break;
+    case 'reserve': m.comment = 'Причина: ' + v.reason; break;
+    case 'writeoff': { const r = S.reasons.find(x => x.id === v.reason); m.reason_id = v.reason; m.document_ref = 'Акт списания № ' + v.act; m.comment = 'Причина: ' + (r ? r.name : ''); break; }
+    case 'dispose': m.document_ref = 'Акт утилизации № ' + v.act; m.comment = 'Организация-утилизатор: ' + v.org; break;
+  }
+  a.status = to; m.status_to = to; m.mol_to = a.responsible_person || null; m.location_to = a.location || null;
+  S.movements.push(m); CACHE = null;
+  return m;
+}
+function stornoTarget(a) { const e = effMovs(a); const last = e[e.length - 1]; return last && last.operation_type !== 'register' ? last : null; }
+function doStorno(a, comment) {
+  const t = stornoTarget(a); if (!t) return;
+  const cur = snapshot(a); Object.assign(a, t.prev);
+  S.movements.push({
+    id: uid(), seq: ++S.seq, asset_id: a.id, operation_type: 'storno', operation_date: TODAY,
+    status_from: cur.status, status_to: a.status, mol_from: cur.responsible_person || null, mol_to: a.responsible_person || null,
+    location_from: cur.location || null, location_to: a.location || null, document_ref: '', storno_of: t.id,
+    comment: `Сторно операции «${OPS[t.operation_type].label}» от ${fmtD(t.operation_date)}. ${comment}`, created_by: USER, created_at: nowStamp()
+  });
+  CACHE = null;
+}
+
+/* ---------- Амортизация (п. 7.3.1) ---------- */
+function depr(a, dTo) {
+  if (a.low_value) return { kind: 'na' };
+  const spi = +a.useful_life_months, cost = (a.cost === '' || a.cost == null) ? NaN : +a.cost;
+  if (!spi || !(cost > 0)) return { kind: 'missing' };
+  const eff = effMovs(a);
+  const wo = eff.find(m => m.operation_type === 'writeoff' && m.operation_date <= dTo);
+  const calcTo = wo ? wo.operation_date : dTo;
+  const kind = wo ? 'off' : 'ok', offDate = wo ? wo.operation_date : null;
+  const rv = Math.min(+a.residual_value || 0, cost);
+  if (!a.accounting_date || a.accounting_date > calcTo) return { kind, remain: spi, residual: cost, elapsed: 0, offDate };
+  const start = a.depreciation_start_date || firstOfNextMonth(a.accounting_date);
+  const endX = addDays(calcTo, 1);
+  let elapsed = Math.max(0, monthsFull(start, endX));
+  // Консервация свыше 3 месяцев продлевает СПИ на время нахождения в резерве
+  const cut = (s, e) => { if (addMonths(s, 3) < e) { const s2 = s > start ? s : start, e2 = e < endX ? e : endX; if (e2 > s2) elapsed -= Math.max(0, monthsFull(s2, e2)); } };
+  let rs = null;
+  for (const m of eff) {
+    if (m.operation_date > calcTo) break;
+    if (m.status_to === 'reserve' && m.status_from !== 'reserve') rs = m.operation_date;
+    else if (rs && m.status_from === 'reserve' && m.status_to !== 'reserve') { cut(rs, m.operation_date); rs = null; }
+  }
+  if (rs) cut(rs, endX);
+  elapsed = Math.max(0, elapsed);
+  const used = Math.min(elapsed, spi);
+  return { kind, remain: Math.max(0, spi - elapsed), residual: Math.max(rv, cost - (cost - rv) / spi * used), elapsed, offDate };
+}
+function remainCell(d) {
+  if (d.kind === 'na') return { h: '<span class="dotted" title="Малоценное оборудование — амортизация не рассчитывается">—</span>', t: '—' };
+  if (d.kind === 'missing') return { h: '<span class="nd" title="Не заполнены СПИ или стоимость">Не задан</span>', t: 'Не задан' };
+  if (d.kind === 'off') return { h: `<span class="dotted" title="Снят с учёта ${fmtD(d.offDate)}">—</span>`, t: `— (снят с учёта ${fmtD(d.offDate)})` };
+  if (d.remain === 0) return { h: '<span class="amort0">Самортизирован</span>', t: 'Самортизирован', v: 0 };
+  return { h: `<span class="${d.remain <= 6 ? 'amort6' : ''}">${fmtMonths(d.remain)}</span>`, t: fmtMonths(d.remain), v: d.remain };
+}
+function residCell(d) {
+  if (d.kind === 'na') return { h: '—', t: '—' };
+  if (d.kind === 'missing') return { h: '<span class="nd">Не задан</span>', t: 'Не задан' };
+  if (d.kind === 'off') return { h: `<span class="dotted" title="Снят с учёта ${fmtD(d.offDate)}">—</span>`, t: '—' };
+  return { h: fmtMoney(d.residual), t: NF.format(d.residual), v: Math.round(d.residual * 100) / 100 };
+}
+
+/* ---------- Демо-данные ---------- */
+function seed() {
+  let t = 0x1F3A5F;
+  const rnd = () => { t |= 0; t = t + 0x6D2B79F5 | 0; let x = Math.imul(t ^ t >>> 15, 1 | t); x = x + Math.imul(x ^ x >>> 7, 61 | x) ^ x; return ((x ^ x >>> 14) >>> 0) / 4294967296; };
+  const rint = (a, b) => a + Math.floor(rnd() * (b - a + 1));
+  const pick = arr => arr[Math.floor(rnd() * arr.length)];
+  const END = TODAY < '2026-09-28' ? TODAY : '2026-09-28';
+  const ok = d => d <= END;
+  S = {
+    version: 1, org: 'ТОО «Наименование организации»', seq: 0, audit: [],
+    departments: [{ id: 'd1', name: 'ИТ-отдел' }, { id: 'd2', name: 'Бухгалтерия' }, { id: 'd3', name: 'Отдел продаж' }, { id: 'd4', name: 'Администрация' }, { id: 'd5', name: 'Склад' }, { id: 'd6', name: 'Отдел кадров' }],
+    locations: [{ id: 'l1', name: 'Склад ИТ-оборудования' }, { id: 'l2', name: 'Главный офис, каб. 101' }, { id: 'l3', name: 'Главный офис, каб. 204' }, { id: 'l4', name: 'Главный офис, каб. 305' }, { id: 'l5', name: 'Серверная' }, { id: 'l6', name: 'Переговорная' }, { id: 'l7', name: 'Филиал, каб. 12' }],
+    categories: [{ id: 'c1', name: 'Ноутбук' }, { id: 'c2', name: 'ПК' }, { id: 'c3', name: 'Монитор' }, { id: 'c4', name: 'Принтер' }, { id: 'c5', name: 'Сервер' }, { id: 'c6', name: 'Сетевое оборудование' }, { id: 'c7', name: 'Периферия' }],
+    reasons: [{ id: 'r1', name: 'Физический износ' }, { id: 'r2', name: 'Неремонтопригодно' }, { id: 'r3', name: 'Моральное устаревание' }, { id: 'r4', name: 'Утрата / хищение' }],
+    employees: [
+      ['e1', 'Ахметов Руслан Серикович', '000101', 'Заведующий складом', 'd5'],
+      ['e2', 'Иванова Елена Петровна', '000102', 'Главный бухгалтер', 'd2'],
+      ['e3', 'Жумабаев Нурлан Ерланович', '000103', 'Руководитель ИТ-отдела', 'd1'],
+      ['e4', 'Ким Александр Викторович', '000104', 'Системный администратор', 'd1'],
+      ['e5', 'Сейтказиева Айгерим Маратовна', '000105', 'Менеджер по продажам', 'd3'],
+      ['e6', 'Петров Дмитрий Андреевич', '000106', 'Инженер-программист', 'd1'],
+      ['e7', 'Нурланова Динара Кайратовна', '000107', 'Специалист по персоналу', 'd6'],
+      ['e8', 'Смагулов Бауыржан Асланович', '000108', 'Директор', 'd4'],
+      ['e9', 'Кузнецова Ольга Игоревна', '000109', 'Бухгалтер', 'd2'],
+      ['e10', 'Абенов Тимур Болатович', '000110', 'Руководитель отдела продаж', 'd3'],
+      ['e11', 'Оспанова Жанар Талгатовна', '000111', 'Офис-менеджер', 'd4'],
+      ['e12', 'Григорьев Сергей Николаевич', '000112', 'Инженер технической поддержки', 'd1']
+    ].map(([id, fio, tab, position, dept]) => ({ id, fio, tab, position, dept, isMol: true, active: true })),
+    assets: [], movements: []
+  };
+  const MODELS = {
+    c1: [['Ноутбук Lenovo ThinkPad T14', 'Lenovo', 'ThinkPad T14 Gen 3'], ['Ноутбук HP EliteBook 840 G9', 'HP', 'EliteBook 840 G9'], ['Ноутбук Dell Latitude 5440', 'Dell', 'Latitude 5440'], ['Ноутбук Apple MacBook Air 13', 'Apple', 'MacBook Air M2']],
+    c2: [['Системный блок HP ProDesk 400 G7', 'HP', 'ProDesk 400 G7'], ['ПК Dell OptiPlex 7010', 'Dell', 'OptiPlex 7010'], ['Моноблок Lenovo ThinkCentre M70a', 'Lenovo', 'ThinkCentre M70a']],
+    c3: [['Монитор Dell P2422H 24"', 'Dell', 'P2422H'], ['Монитор LG 27UL500 27"', 'LG', '27UL500'], ['Монитор Samsung S24R350 24"', 'Samsung', 'S24R350']],
+    c4: [['МФУ HP LaserJet Pro M428fdn', 'HP', 'LaserJet Pro M428fdn'], ['Принтер Canon i-SENSYS LBP223dw', 'Canon', 'LBP223dw'], ['МФУ Kyocera ECOSYS M2540dn', 'Kyocera', 'ECOSYS M2540dn']],
+    c5: [['Сервер Dell PowerEdge R650', 'Dell', 'PowerEdge R650'], ['Сервер HPE ProLiant DL380 Gen10', 'HPE', 'ProLiant DL380 Gen10']],
+    c6: [['Коммутатор Cisco Catalyst 2960-X', 'Cisco', 'WS-C2960X-24TS-L'], ['Маршрутизатор MikroTik CCR2004', 'MikroTik', 'CCR2004-16G-2S+'], ['Точка доступа Ubiquiti U6 Pro', 'Ubiquiti', 'U6-Pro']],
+    c7: [['ИБП APC Back-UPS 650', 'APC', 'BX650LI'], ['Веб-камера Logitech C920', 'Logitech', 'C920'], ['Док-станция Lenovo USB-C', 'Lenovo', '40AY0090'], ['Комплект клавиатура и мышь Logitech MK270', 'Logitech', 'MK270']]
+  };
+  const CAT = {
+    c1: { w: 14, cost: [420000, 880000], spi: 36 }, c2: { w: 8, cost: [300000, 620000], spi: 48 }, c3: { w: 10, cost: [80000, 180000], spi: 60 },
+    c4: { w: 4, cost: [140000, 420000], spi: 60 }, c5: { w: 2, cost: [3500000, 7200000], spi: 84, srv: true }, c6: { w: 4, cost: [120000, 1100000], spi: 60, srv: true },
+    c7: { w: 6, cost: [6000, 55000], low: true }
+  };
+  const weighted = []; for (const [id, c] of Object.entries(CAT)) for (let i = 0; i < c.w; i++) weighted.push(id);
+  const molPool = S.employees.filter(e => e.dept !== 'd5').map(e => e.id);
+  const officeLocs = ['l2', 'l3', 'l4', 'l6', 'l7'];
+  const SERV = ['Сервисный центр «ТехноСервис»', 'Авторизованный сервис производителя', 'ИТ-отдел (внутренняя диагностика)'];
+  const FAULTS = ['Не включается', 'Неисправна клавиатура', 'Перегрев, шум вентилятора', 'Замятие бумаги, износ фотобарабана', 'Битые пиксели на матрице', 'Отказ накопителя'];
+  const RESULTS = ['Заменён накопитель', 'Выполнена чистка и замена термопасты', 'Замена клавиатуры', 'Неисправность не подтвердилась', 'Замена блока питания'];
+  const UTIL = ['ТОО «ЭкоУтиль»', 'ТОО «Вторсырьё-Сервис»'];
+  const serial = () => pick(['PF', '5CG', 'CN', 'SN', 'HX']) + Array.from({ length: 7 }, () => '0123456789ABCDEFGHJKLMNPRSTUVWXYZ'[rint(0, 32)]).join('');
+  let invN = 1000;
+  const mk = (catId, model, reg, extra = {}) => {
+    const c = CAT[catId], [name, man, mod] = model;
+    const raw = rint(c.cost[0], c.cost[1]);
+    const purchase = addDays(reg, -rint(0, 6));
+    const a = {
+      id: uid(), inventory_number: String(++invN).padStart(8, '0'), name, category: catId, serial_number: serial(), manufacturer: man, model: mod,
+      responsible_person: null, location: null, status: 'received', accounting_date: null, purchase_date: purchase,
+      cost: c.low ? Math.round(raw / 100) * 100 : Math.round(raw / 1000) * 1000, warranty_until: addMonths(purchase, pick([12, 24, 36])),
+      useful_life_months: c.low ? null : c.spi, depreciation_start_date: null, depr_start_reason: '', depreciation_method: 'Линейный',
+      amortization_group: c.low ? '' : 'Группа IV', low_value: !!c.low, residual_value: 0, comment: '', ...extra
+    };
+    S.assets.push(a);
+    applyOp(a, 'register', { date: reg, doc: `Накладная № ${rint(100, 999)} от ${fmtD(purchase)}` }, reg + 'T09:30:00');
+    return a;
+  };
+  const at = d => d + 'T10:' + pad(rint(0, 59)) + ':00';
+  const accept = (a, date) => applyOp(a, 'accept', { date, inv: a.inventory_number, mol: 'e1', loc: 'l1', spi: a.useful_life_months || '', doc: `Акт приёма-передачи № ${rint(100, 999)} от ${fmtD(date)}` }, at(date));
+  const issueV = a => ({ mol: pick(molPool), loc: CAT[a.category].srv ? 'l5' : pick(officeLocs), doc: `Требование-накладная № ${rint(100, 999)}` });
+  const writeoff = (a, date, reason) => applyOp(a, 'writeoff', { date, reason, act: `АС-${rint(10, 99)}/${date.slice(0, 4)}` }, at(date));
+  function randomOp(a, date) {
+    const s = a.status, x = rnd();
+    if (s === 'stock') {
+      if (x < .78) return applyOp(a, 'issue', { date, ...issueV(a) }, at(date));
+      if (x < .87) return applyOp(a, 'repair', { date, service: pick(SERV), fault: pick(FAULTS) }, at(date));
+      if (x < .96) return applyOp(a, 'reserve', { date, reason: 'Подменный фонд' }, at(date));
+      return writeoff(a, date, 'r3');
+    }
+    if (s === 'use') {
+      if (x < .34) { const v = issueV(a); return applyOp(a, 'move', { date, mol: v.mol, loc: v.loc, doc: `Распоряжение № ${rint(10, 99)}` }, at(date)); }
+      if (x < .52) return applyOp(a, 'return', { date, mol: 'e1', loc: 'l1', cond: pick(['Исправно', 'Исправно', 'Требует обслуживания']) }, at(date));
+      if (x < .68) return applyOp(a, 'repair', { date, service: pick(SERV), fault: pick(FAULTS) }, at(date));
+      if (x < .72) return applyOp(a, 'reserve', { date, reason: 'Консервация' }, at(date));
+      if (x < .76) return writeoff(a, date, 'r1');
+      return false;
+    }
+    if (s === 'repair') {
+      if (x < .86) { const toStock = a.location === 'l1'; return applyOp(a, 'fromRepair', { date, target: toStock ? 'stock' : 'use', mol: toStock ? 'e1' : a.responsible_person, result: pick(RESULTS) }, at(date)); }
+      return writeoff(a, date, 'r2');
+    }
+    if (s === 'reserve') { if (x < .8) return applyOp(a, 'issue', { date, ...issueV(a) }, at(date)); return writeoff(a, date, 'r3'); }
+    if (s === 'writtenoff') { if (x < .6) return applyOp(a, 'dispose', { date, org: pick(UTIL), act: `АУ-${rint(10, 99)}/${date.slice(0, 4)}` }, at(date)); return false; }
+    return false;
+  }
+  const lastDate = a => S.movements.filter(m => m.asset_id === a.id).reduce((mx, m) => m.operation_date > mx ? m.operation_date : mx, '');
+
+  // Контрольный пример из п. 7.3.1 (инв. № с ведущими нулями)
+  const ctrl = mk('c1', MODELS.c1[0], '2025-03-10', { inventory_number: '00000123', cost: 612000, serial_number: 'PF3K2L9X', purchase_date: '2025-03-05', warranty_until: '2027-03-05', comment: 'Контрольный пример расчёта амортизации (п. 7.3.1 PRD)' });
+  accept(ctrl, '2025-03-15'); applyOp(ctrl, 'issue', { date: '2025-03-20', mol: 'e5', loc: 'l3', doc: 'Требование-накладная № 214' }, at('2025-03-20'));
+
+  for (let i = 0; i < 52; i++) {
+    const catId = pick(weighted);
+    const reg = addDays('2022-01-10', rint(0, 1640)); if (!ok(reg)) continue;
+    const a = mk(catId, pick(MODELS[catId]), reg);
+    let d = addDays(reg, rint(1, 6)); if (!ok(d)) continue;
+    accept(a, d);
+    let n = rint(1, 5);
+    while (n-- > 0) { d = addDays(d, rint(10, 220)); if (!ok(d)) break; if (randomOp(a, d) === false) break; }
+    if (a.status === 'stock' && rnd() < .6) { d = addDays(d, rint(3, 20)); if (ok(d)) applyOp(a, 'issue', { date: d, ...issueV(a) }, at(d)); }
+  }
+  // Полностью самортизированный ПК в эксплуатации
+  const old = mk('c2', ['ПК Dell OptiPlex 3060', 'Dell', 'OptiPlex 3060'], '2021-02-05', { cost: 318000, warranty_until: '2023-02-05' });
+  accept(old, '2021-02-10'); applyOp(old, 'issue', { date: '2021-02-15', mol: 'e9', loc: 'l4', doc: 'Требование-накладная № 37' }, at('2021-02-15'));
+  // Консервация свыше 3 месяцев (СПИ продлевается)
+  const mon = mk('c3', MODELS.c3[1], '2024-05-12', { cost: 142000 });
+  accept(mon, '2024-05-14'); applyOp(mon, 'issue', { date: '2024-05-20', mol: 'e10', loc: 'l2', doc: 'Требование-накладная № 402' }, at('2024-05-20'));
+  applyOp(mon, 'reserve', { date: '2025-11-03', reason: 'Консервация на период реорганизации отдела' }, at('2025-11-03'));
+  if (ok('2026-04-15')) applyOp(mon, 'issue', { date: '2026-04-15', mol: 'e10', loc: 'l2', doc: 'Распоряжение № 18' }, at('2026-04-15'));
+  // Актив без стоимости и СПИ
+  const nd = mk('c2', MODELS.c2[2], '2026-02-02', { cost: null, useful_life_months: null, comment: 'Ожидается счёт-фактура для определения стоимости' });
+  accept(nd, '2026-02-04'); applyOp(nd, 'issue', { date: '2026-02-06', mol: 'e11', loc: 'l2', doc: 'Требование-накладная № 77' }, at('2026-02-06'));
+
+  // Движения текущего месяца
+  const cand = S.assets.filter(a => ON_BOOKS.includes(a.status) && lastDate(a) < '2026-09-01');
+  for (let i = 0; i < 14 && cand.length; i++) {
+    const a = cand.splice(rint(0, cand.length - 1), 1)[0];
+    const d = '2026-09-' + pad(rint(1, 26)); if (ok(d)) randomOp(a, d);
+  }
+  const wo = S.assets.find(a => a.status === 'use' && a.accounting_date && a.accounting_date < '2022-09-01' && a.id !== old.id);
+  if (wo && ok('2026-09-18') && lastDate(wo) <= '2026-09-18') writeoff(wo, '2026-09-18', 'r1');
+  if (ok('2026-09-04')) { const r1 = mk('c1', MODELS.c1[1], '2026-09-02'); accept(r1, '2026-09-03'); applyOp(r1, 'issue', { date: '2026-09-04', mol: 'e6', loc: 'l3', doc: 'Требование-накладная № 511' }, at('2026-09-04')); }
+  if (ok('2026-09-10')) { const r2 = mk('c3', MODELS.c3[0], '2026-09-08'); accept(r2, '2026-09-09'); applyOp(r2, 'issue', { date: '2026-09-10', mol: 'e6', loc: 'l3', doc: 'Требование-накладная № 512' }, at('2026-09-10')); }
+  if (ok('2026-09-16')) { const r3 = mk('c4', MODELS.c4[0], '2026-09-15'); accept(r3, '2026-09-16'); }
+  if (ok('2026-09-25')) { mk('c1', MODELS.c1[2], '2026-09-22'); mk('c7', MODELS.c7[1], '2026-09-24'); mk('c3', MODELS.c3[2], '2026-09-25'); }
+
+  // Истекающие гарантии
+  const inUse = S.assets.filter(a => a.status === 'use' && (a.category === 'c1' || a.category === 'c3') && a.id !== ctrl.id);
+  if (inUse[0]) inUse[0].warranty_until = addDays(TODAY, 9);
+  if (inUse[1]) inUse[1].warranty_until = addDays(TODAY, 23);
+  // Уволенный сотрудник, за которым остались активы
+  S.employees.find(e => e.id === 'e12').active = false;
+  CACHE = null;
+  return S;
+}
+
+/* ---------- Специальные фильтры (KPI) ---------- */
+const SPECIAL = {
+  warranty: { label: 'Истекает гарантия в ближайшие 30 дней', short: 'Гарантия ≤ 30 дней', icon: 'shield', test: a => !!a.warranty_until && a.warranty_until >= TODAY && a.warranty_until <= addDays(TODAY, 30) && !CLOSED.includes(a.status) },
+  amortized: { label: 'Полностью самортизировано, в эксплуатации', short: 'Самортизировано, в эксплуатации', icon: 'clock', test: a => { if (a.status !== 'use') return false; const d = depr(a, TODAY); return d.kind === 'ok' && d.remain === 0; } },
+  nomol: { label: 'Активы без МОЛ', short: 'Без МОЛ', icon: 'userX', test: a => { if (CLOSED.includes(a.status)) return false; const e = emp(a.responsible_person); return !e || !e.active; } }
+};
+
+/* ---------- Toast / Modal ---------- */
+function toast(msg, isErr) {
+  const el = document.createElement('div'); el.className = 'toast' + (isErr ? ' err' : ''); el.innerHTML = (isErr ? icon('alert') : icon('check')) + `<span>${esc(msg)}</span>`;
+  $('#toasts').appendChild(el); setTimeout(() => el.remove(), 3600);
+}
+function openModal({ title, sub, body, foot, wide, onClose }) {
+  const back = document.createElement('div'); back.className = 'modal-back';
+  back.innerHTML = `<div class="modal ${wide ? 'wide' : ''}" role="dialog" aria-modal="true" aria-labelledby="mt${S.seq}"><div class="modal-h"><div><h3 id="mt${S.seq}">${esc(title)}</h3>${sub ? `<div class="modal-sub">${sub}</div>` : ''}</div><button class="icon-btn" type="button" data-x aria-label="Закрыть">${icon('x', 18)}</button></div><div class="modal-b">${body}</div>${foot ? `<div class="modal-f">${foot}</div>` : ''}</div>`;
+  const prev = document.activeElement;
+  const close = () => { back.remove(); if (prev && prev.focus && document.contains(prev)) prev.focus(); onClose && onClose(); };
+  back.close = close;
+  back.addEventListener('mousedown', e => { if (e.target === back) close(); });
+  back.querySelectorAll('[data-x]').forEach(b => b.addEventListener('click', close));
+  $('#modalRoot').appendChild(back);
+  setTimeout(() => { const f = back.querySelector('.modal-b input:not([type=checkbox]):not(:disabled), .modal-b select, .modal-b textarea'); f && f.focus(); }, 30);
+  return back;
+}
+
+/* ---------- Конструктор форм ---------- */
+function opt(list, sel, empty) { return (empty != null ? `<option value="">${esc(empty)}</option>` : '') + list.map(([v, l]) => `<option value="${esc(v)}" ${String(v) === String(sel ?? '') ? 'selected' : ''}>${esc(l)}</option>`).join(''); }
+const molList = (all) => S.employees.filter(e => all || (e.active && e.isMol)).sort((a, b) => a.fio.localeCompare(b.fio, 'ru')).map(e => [e.id, `${e.fio} — ${e.position || deptName(e.dept)}${e.active ? '' : ' (уволен)'}`]);
+function fieldHTML(f, v) {
+  const id = 'f_' + f.k, req = f.req ? '<span class="req" aria-hidden="true">*</span>' : '';
+  const dis = f.disabled ? 'disabled' : '', ph = f.ph ? `placeholder="${esc(f.ph)}"` : '';
+  let inp;
+  switch (f.type) {
+    case 'date': inp = `<input type="date" id="${id}" name="${f.k}" value="${esc(v || '')}" ${f.min ? `min="${f.min}"` : ''} ${f.max ? `max="${f.max}"` : ''} ${dis}>`; break;
+    case 'mol': inp = `<select id="${id}" name="${f.k}" ${dis}>${opt(molList(), v, f.empty || '— выберите сотрудника —')}</select>`; break;
+    case 'loc': inp = `<select id="${id}" name="${f.k}" ${dis}>${opt(S.locations.map(x => [x.id, x.name]), v, f.empty || '— не указана —')}</select>`; break;
+    case 'cat': inp = `<select id="${id}" name="${f.k}" ${dis}>${opt(S.categories.map(x => [x.id, x.name]), v, '— выберите —')}</select>`; break;
+    case 'dept': inp = `<select id="${id}" name="${f.k}" ${dis}>${opt(S.departments.map(x => [x.id, x.name]), v, '— выберите —')}</select>`; break;
+    case 'reason': inp = `<select id="${id}" name="${f.k}" ${dis}>${opt(S.reasons.map(x => [x.id, x.name]), v, '— выберите —')}</select>`; break;
+    case 'select': inp = `<select id="${id}" name="${f.k}" ${dis}>${opt(f.options.map(o => Array.isArray(o) ? o : [o, o]), v, f.empty === false ? null : '— выберите —')}</select>`; break;
+    case 'textarea': inp = `<textarea id="${id}" name="${f.k}" rows="3" ${ph} ${dis}>${esc(v || '')}</textarea>`; break;
+    case 'number': inp = `<input type="number" id="${id}" name="${f.k}" value="${esc(v ?? '')}" min="0" step="${f.step || 1}" ${ph} ${dis}>`; break;
+    case 'inv': inp = `<input type="text" class="mono" id="${id}" name="${f.k}" value="${esc(v || '')}" inputmode="numeric" maxlength="8" autocomplete="off" placeholder="00000000" ${dis}>`; break;
+    case 'checkbox': return `<div class="fld ${f.full ? 'full' : ''}"><label class="chk" for="${id}"><input type="checkbox" id="${id}" name="${f.k}" ${v ? 'checked' : ''} ${dis}> ${esc(f.label)}</label>${f.hint ? `<div class="hint">${esc(f.hint)}</div>` : ''}<div class="ferr" id="e_${f.k}"></div></div>`;
+    default: inp = `<input type="text" id="${id}" name="${f.k}" value="${esc(v || '')}" ${ph} ${dis}>`;
+  }
+  return `<div class="fld ${f.full ? 'full' : ''}"><label for="${id}">${esc(f.label)}${req}</label>${inp}${f.hint ? `<div class="hint">${esc(f.hint)}</div>` : ''}<div class="ferr" id="e_${f.k}" aria-live="polite"></div></div>`;
+}
+const formHTML = (fields, vals) => fields.map(f => fieldHTML(f, vals[f.k])).join('');
+function readForm(root, fields) { const v = {}; for (const f of fields) { const el = root.querySelector('#f_' + f.k); if (!el) continue; v[f.k] = f.type === 'checkbox' ? el.checked : el.value.trim(); } return v; }
+function bindForm(root, fields, validate, buttons) {
+  const btns = [].concat(buttons); const touched = new Set(); let submitted = false;
+  const run = () => {
+    const v = readForm(root, fields), errs = validate(v) || {};
+    for (const f of fields) {
+      const e = root.querySelector('#e_' + f.k), inp = root.querySelector('#f_' + f.k); if (!e) continue;
+      const hasVal = f.type !== 'checkbox' && v[f.k] !== '' && v[f.k] != null;
+      const show = errs[f.k] && (touched.has(f.k) || submitted || hasVal);
+      e.textContent = show ? errs[f.k] : ''; inp && inp.setAttribute('aria-invalid', show ? 'true' : 'false');
+    }
+    btns.forEach(b => b.disabled = Object.keys(errs).length > 0);
+    return { v, errs };
+  };
+  const on = e => { if (e.target.name) touched.add(e.target.name); run(); };
+  root.addEventListener('input', on); root.addEventListener('change', on);
+  root.addEventListener('submit', e => e.preventDefault());
+  run();
+  return { run, all() { submitted = true; return run(); } };
+}
+
+/* ---------- Поля операций (табл. 4.2) ---------- */
+function opFields(op, a) {
+  const minD = lastEffDate(a) || '';
+  const date = (label = 'Дата операции') => ({ k: 'date', label, type: 'date', req: true, min: minD, max: TODAY });
+  switch (op) {
+    case 'accept': return [
+      { k: 'inv', label: 'Инвентарный номер', type: 'inv', req: true, def: a.inventory_number, hint: '8 цифр, ведущие нули сохраняются' },
+      date('Дата принятия к учёту'),
+      { k: 'mol', label: 'МОЛ (склад)', type: 'mol', req: true, def: whMol() },
+      { k: 'loc', label: 'Локация', type: 'loc', def: whLoc() },
+      { k: 'spi', label: 'Срок полезного использования (бух.), мес.', type: 'number', req: !a.low_value, def: a.useful_life_months ?? '', hint: a.low_value ? 'Малоценное оборудование — амортизация не рассчитывается' : 'Амортизация начнётся с 1-го числа следующего месяца' },
+      { k: 'doc', label: 'Основание (документ)', type: 'text', req: true, ph: 'Акт приёма-передачи № 15 от 01.09.2026' }];
+    case 'issue': return [
+      { k: 'mol', label: 'Сотрудник-получатель (новый МОЛ)', type: 'mol', req: true, full: true }, date(),
+      { k: 'loc', label: 'Локация', type: 'loc', req: true, empty: '— выберите —' },
+      { k: 'doc', label: 'Основание (документ)', type: 'text', full: true, ph: 'Требование-накладная № …' }];
+    case 'move': return [
+      { k: 'mol', label: 'Новый МОЛ', type: 'mol', def: a.responsible_person, full: true },
+      { k: 'loc', label: 'Новая локация', type: 'loc', def: a.location, empty: '— без изменений —' }, date(),
+      { k: 'doc', label: 'Основание (документ)', type: 'text', req: true, full: true, ph: 'Распоряжение № …' }];
+    case 'return': return [
+      date(), { k: 'mol', label: 'МОЛ склада', type: 'mol', req: true, def: whMol() },
+      { k: 'loc', label: 'Локация', type: 'loc', def: whLoc() },
+      { k: 'cond', label: 'Состояние', type: 'select', req: true, options: ['Исправно', 'Требует обслуживания', 'Неисправно', 'Некомплект'] }];
+    case 'repair': return [
+      date(), { k: 'service', label: 'Сервис / исполнитель', type: 'text', req: true },
+      { k: 'fault', label: 'Описание неисправности', type: 'textarea', req: true, full: true }];
+    case 'fromRepair': return [
+      date(), { k: 'target', label: 'Вернуть в статус', type: 'select', req: true, empty: false, options: [['use', 'В эксплуатации'], ['stock', 'На складе']], def: 'use' },
+      { k: 'mol', label: 'МОЛ', type: 'mol', req: true, def: a.responsible_person },
+      { k: 'loc', label: 'Локация (при возврате на склад)', type: 'loc', def: whLoc() },
+      { k: 'result', label: 'Результат ремонта', type: 'textarea', req: true, full: true }];
+    case 'reserve': return [date(), { k: 'reason', label: 'Причина', type: 'textarea', req: true, full: true, ph: 'Консервация, подменный фонд…' }];
+    case 'writeoff': return [date(), { k: 'reason', label: 'Причина списания', type: 'reason', req: true }, { k: 'act', label: 'Номер акта списания', type: 'text', req: true, full: true }];
+    case 'dispose': return [date(), { k: 'org', label: 'Организация-утилизатор', type: 'text', req: true }, { k: 'act', label: 'Номер акта утилизации', type: 'text', req: true, full: true }];
+  }
+  return [];
+}
+function validateOp(a, op, v, fields) {
+  const e = {};
+  for (const f of fields) if (f.req && !v[f.k]) e[f.k] = 'Обязательное поле';
+  if (v.date) {
+    const min = lastEffDate(a);
+    if (min && v.date < min) e.date = `Не ранее даты предыдущей операции (${fmtD(min)})`;
+    else if (v.date > TODAY) e.date = 'Дата не может быть позже текущей';
+  }
+  if (v.inv) { const ie = invError(v.inv, a.id); if (ie) e.inv = ie; }
+  if (v.spi && (!/^\d+$/.test(v.spi) || +v.spi < 1 || +v.spi > 600)) e.spi = 'Целое число месяцев от 1 до 600';
+  if (v.mol) { const em = emp(v.mol); if (!em || !em.active) e.mol = 'Уволенного сотрудника нельзя назначить МОЛ'; }
+  if (op === 'move' && !e.mol) { if ((!v.mol || v.mol === a.responsible_person) && (!v.loc || v.loc === (a.location || ''))) e.mol = 'Укажите новый МОЛ и/или новую локацию'; }
+  return e;
+}
+function openOp(id, op) {
+  const a = idx().asset.get(id); if (!a || !OPS[op].from.includes(a.status)) return;
+  const fields = opFields(op, a), vals = {};
+  fields.forEach(f => vals[f.k] = f.def ?? ''); vals.date = TODAY;
+  const target = op === 'fromRepair' ? '' : `${icon('arrow')} ${badge(OPS[op].to)}`;
+  const m = openModal({
+    title: OPS[op].label,
+    sub: `<span class="mono">${esc(a.inventory_number)}</span> · ${esc(a.name)}<br>МОЛ: ${esc(empFull(a.responsible_person))} · Локация: ${esc(locName(a.location))}`,
+    body: `<div class="op-flow"><span class="muted">Текущий статус:</span> ${badge(a.status)} ${target}</div><form class="form-grid" novalidate>${formHTML(fields, vals)}</form><p class="hint" style="margin:16px 0 0">Поля, отмеченные *, обязательны. Запись в журнале движения неизменяема; исправление — только операцией сторно.</p>`,
+    foot: `<button class="btn btn-secondary" type="button" data-x>Отмена</button><button class="btn btn-primary" type="button" data-ok>Подтвердить</button>`
+  });
+  const form = m.querySelector('form'), ok = m.querySelector('[data-ok]');
+  const ctl = bindForm(form, fields, v => validateOp(a, op, v, fields), ok);
+  ok.onclick = () => { const { v, errs } = ctl.all(); if (Object.keys(errs).length) return; applyOp(a, op, v); save(); m.close(); toast(`${OPS[op].label}: ${a.inventory_number}`); refreshAll(); };
+}
+function openStorno(id) {
+  const a = idx().asset.get(id), t = stornoTarget(a); if (!t) return;
+  const fields = [{ k: 'comment', label: 'Комментарий (причина сторно)', type: 'textarea', req: true, full: true }];
+  const m = openModal({
+    title: 'Сторно операции',
+    sub: `<span class="mono">${esc(a.inventory_number)}</span> · ${esc(a.name)}`,
+    body: `<div class="note warn">Будет отменена последняя операция <b>«${OPS[t.operation_type].label}»</b> от ${fmtD(t.operation_date)}. Исходная запись сохранится в журнале с пометкой «сторнирована», актив вернётся в состояние ${badge(t.status_from)}.</div><form class="form-grid one" novalidate>${formHTML(fields, {})}</form>`,
+    foot: `<button class="btn btn-secondary" type="button" data-x>Отмена</button><button class="btn btn-danger" type="button" data-ok>Выполнить сторно</button>`
+  });
+  const ctl = bindForm(m.querySelector('form'), fields, v => v.comment ? {} : { comment: 'Обязательное поле' }, m.querySelector('[data-ok]'));
+  m.querySelector('[data-ok]').onclick = () => { const { v, errs } = ctl.all(); if (Object.keys(errs).length) return; doStorno(a, v.comment); save(); m.close(); toast('Операция сторнирована'); refreshAll(); };
+}
+
+/* ---------- Массовые операции ---------- */
+function openBulk(op) {
+  const all = [...R.sel].map(id => idx().asset.get(id)).filter(Boolean);
+  const okList = all.filter(a => OPS[op].from.includes(a.status));
+  const minD = okList.reduce((mx, a) => { const d = lastEffDate(a) || ''; return d > mx ? d : mx; }, '');
+  const F = {
+    issue: [{ k: 'mol', label: 'Сотрудник-получатель (новый МОЛ)', type: 'mol', req: true, full: true }, { k: 'date', label: 'Дата операции', type: 'date', req: true, min: minD, max: TODAY }, { k: 'loc', label: 'Локация', type: 'loc', req: true, empty: '— выберите —' }, { k: 'doc', label: 'Основание (документ)', type: 'text', full: true }],
+    move: [{ k: 'mol', label: 'Новый МОЛ', type: 'mol', req: true, full: true }, { k: 'loc', label: 'Новая локация', type: 'loc', empty: '— без изменений —' }, { k: 'date', label: 'Дата операции', type: 'date', req: true, min: minD, max: TODAY }, { k: 'doc', label: 'Основание (документ)', type: 'text', req: true, full: true }],
+    return: [{ k: 'mol', label: 'МОЛ склада', type: 'mol', req: true, def: whMol() }, { k: 'date', label: 'Дата операции', type: 'date', req: true, min: minD, max: TODAY }, { k: 'loc', label: 'Локация', type: 'loc', def: whLoc() }, { k: 'cond', label: 'Состояние', type: 'select', req: true, options: ['Исправно', 'Требует обслуживания', 'Неисправно', 'Некомплект'] }]
+  }[op];
+  const vals = { date: TODAY }; F.forEach(f => { if (f.def) vals[f.k] = f.def; });
+  const skipped = all.length - okList.length;
+  const m = openModal({
+    title: `Массовая операция: ${OPS[op].label}`,
+    sub: `Выбрано активов: ${all.length}`,
+    body: `${okList.length ? `<div class="note">Будет обработано: <b>${okList.length}</b> — ${okList.slice(0, 12).map(a => `<span class="mono">${a.inventory_number}</span>`).join(', ')}${okList.length > 12 ? ' …' : ''}${skipped ? `<br>Пропущено (операция недопустима из текущего статуса): ${skipped}` : ''}</div>` : `<div class="note warn">Ни один из выбранных активов не находится в статусе, допускающем операцию «${OPS[op].label}».</div>`}<form class="form-grid" novalidate>${formHTML(F, vals)}</form>`,
+    foot: `<button class="btn btn-secondary" type="button" data-x>Отмена</button><button class="btn btn-primary" type="button" data-ok>Выполнить</button>`
+  });
+  const ok = m.querySelector('[data-ok]');
+  const validate = v => {
+    const e = {}; if (!okList.length) e._ = 1;
+    F.forEach(f => { if (f.req && !v[f.k]) e[f.k] = 'Обязательное поле'; });
+    if (v.date) { if (minD && v.date < minD) e.date = `Не ранее ${fmtD(minD)} (последняя операция по выбранным активам)`; else if (v.date > TODAY) e.date = 'Дата не может быть позже текущей'; }
+    if (v.mol) { const em = emp(v.mol); if (!em || !em.active) e.mol = 'Уволенного сотрудника нельзя назначить МОЛ'; }
+    return e;
+  };
+  const ctl = bindForm(m.querySelector('form'), F, validate, ok);
+  ok.onclick = () => {
+    const { v, errs } = ctl.all(); if (Object.keys(errs).length) return;
+    let n = 0;
+    for (const a of okList) { if (op === 'move' && v.mol === a.responsible_person && (!v.loc || v.loc === a.location)) continue; applyOp(a, op, v); n++; }
+    save(); R.sel.clear(); m.close(); toast(`${OPS[op].label}: обработано ${n}`); refreshAll();
+  };
+}
+
+/* ---------- Карточка нового / редактируемого актива ---------- */
+function assetFields(mode, a) {
+  const f = [
+    { k: 'inventory_number', label: 'Инвентарный номер', type: 'inv', req: true, disabled: mode === 'edit' && a.status !== 'received', hint: mode === 'new' ? 'Предложен следующий свободный номер — можно изменить' : (a.status !== 'received' ? 'Изменяется только до принятия к учёту' : '') },
+    { k: 'name', label: 'Наименование', type: 'text', req: true, full: true, ph: 'Ноутбук Lenovo ThinkPad T14' },
+    { k: 'category', label: 'Категория', type: 'cat', req: true },
+    { k: 'serial_number', label: 'Серийный (заводской) номер', type: 'text' },
+    { k: 'manufacturer', label: 'Производитель', type: 'text' },
+    { k: 'model', label: 'Модель', type: 'text' },
+    { k: 'purchase_date', label: 'Дата покупки', type: 'date', max: TODAY },
+    { k: 'warranty_until', label: 'Гарантия до', type: 'date' },
+    { k: 'cost', label: 'Первоначальная стоимость, ₸', type: 'number', step: '0.01' },
+    { k: 'residual_value', label: 'Ликвидационная стоимость, ₸', type: 'number', step: '0.01' },
+    { k: 'useful_life_months', label: 'СПИ (бухгалтерский), мес.', type: 'number' },
+    { k: 'amortization_group', label: 'Амортизационная группа (справочно)', type: 'text' },
+    { k: 'low_value', label: 'Малоценное оборудование (ниже лимита ОС) — амортизация не рассчитывается', type: 'checkbox', full: true }
+  ];
+  if (mode === 'edit' && a.accounting_date) f.push(
+    { k: 'depreciation_start_date', label: 'Дата начала амортизации', type: 'date', hint: 'По умолчанию — 1-е число месяца, следующего за принятием к учёту' },
+    { k: 'depr_start_reason', label: 'Основание изменения даты', type: 'text' });
+  if (mode === 'new') f.push({ k: 'reg_date', label: 'Дата поступления', type: 'date', req: true, max: TODAY });
+  f.push({ k: 'comment', label: 'Комментарий', type: 'textarea', full: true });
+  return f;
+}
+function validateAsset(v, a) {
+  const e = {};
+  const ie = invError(v.inventory_number, a && a.id); if (ie) e.inventory_number = ie;
+  if (!v.name) e.name = 'Обязательное поле';
+  if (!v.category) e.category = 'Обязательное поле';
+  if (v.cost !== '' && (isNaN(+v.cost) || +v.cost < 0)) e.cost = 'Неотрицательное число';
+  if (v.residual_value !== '' && (isNaN(+v.residual_value) || +v.residual_value < 0)) e.residual_value = 'Неотрицательное число';
+  else if (v.cost !== '' && +v.residual_value > +v.cost) e.residual_value = 'Не больше первоначальной стоимости';
+  if (v.useful_life_months !== '' && (!/^\d+$/.test(v.useful_life_months) || +v.useful_life_months < 1 || +v.useful_life_months > 600)) e.useful_life_months = 'Целое число от 1 до 600';
+  if (a && ON_BOOKS.includes(a.status) && !v.low_value && v.useful_life_months === '') e.useful_life_months = 'Обязателен для актива, принятого к учёту';
+  if ('reg_date' in v) { if (!v.reg_date) e.reg_date = 'Обязательное поле'; else if (v.reg_date > TODAY) e.reg_date = 'Дата не может быть позже текущей'; }
+  if (a && 'depreciation_start_date' in v) {
+    if (!v.depreciation_start_date) e.depreciation_start_date = 'Обязательное поле';
+    else if (v.depreciation_start_date !== (a.depreciation_start_date || '') && !v.depr_start_reason) e.depr_start_reason = 'Укажите основание изменения даты';
+  }
+  return e;
+}
+function assetFromForm(a, v) {
+  Object.assign(a, {
+    name: v.name, category: v.category, serial_number: v.serial_number, manufacturer: v.manufacturer, model: v.model,
+    purchase_date: v.purchase_date || null, warranty_until: v.warranty_until || null,
+    cost: v.cost === '' ? null : +v.cost, residual_value: v.residual_value === '' ? 0 : +v.residual_value,
+    useful_life_months: v.useful_life_months === '' ? null : +v.useful_life_months,
+    amortization_group: v.amortization_group, low_value: !!v.low_value, comment: v.comment
+  });
+}
+const assetVals = a => ({
+  inventory_number: a.inventory_number, name: a.name, category: a.category, serial_number: a.serial_number || '', manufacturer: a.manufacturer || '', model: a.model || '',
+  purchase_date: a.purchase_date || '', warranty_until: a.warranty_until || '', cost: a.cost ?? '', residual_value: a.residual_value ?? 0,
+  useful_life_months: a.useful_life_months ?? '', amortization_group: a.amortization_group || '', low_value: a.low_value, comment: a.comment || '',
+  depreciation_start_date: a.depreciation_start_date || '', depr_start_reason: a.depr_start_reason || ''
+});
+function openNewAsset() {
+  const fields = assetFields('new');
+  const m = openModal({
+    title: 'Новый актив', wide: true,
+    sub: 'Регистрация поступившего оборудования. После сохранения статус — «Поступил».',
+    body: `<form class="form-grid" novalidate>${formHTML(fields, { inventory_number: nextInv(), reg_date: TODAY, residual_value: '0' })}</form>`,
+    foot: `<button class="btn btn-secondary" type="button" data-x>Отмена</button><button class="btn btn-secondary" type="button" data-save>Сохранить</button><button class="btn btn-primary" type="button" data-accept>Сохранить и принять к учёту</button>`
+  });
+  const b1 = m.querySelector('[data-save]'), b2 = m.querySelector('[data-accept]');
+  const ctl = bindForm(m.querySelector('form'), fields, v => validateAsset(v, null), [b1, b2]);
+  const create = acc => {
+    const { v, errs } = ctl.all(); if (Object.keys(errs).length) return;
+    const a = { id: uid(), inventory_number: v.inventory_number, status: 'received', responsible_person: null, location: null, accounting_date: null, depreciation_start_date: null, depr_start_reason: '', depreciation_method: 'Линейный' };
+    assetFromForm(a, v); S.assets.push(a); applyOp(a, 'register', { date: v.reg_date }); save();
+    m.close(); toast(`Актив ${a.inventory_number} зарегистрирован`); refreshAll();
+    if (acc) openOp(a.id, 'accept'); else openAsset(a.id);
+  };
+  b1.onclick = () => create(false); b2.onclick = () => create(true);
+}
+
+/* ---------- Реестр ---------- */
+const R = { q: '', cat: '', status: '', mol: '', dept: '', loc: '', special: '', sort: 'inv', dir: 1, page: 1, size: 25, sel: new Set() };
+const REG_COLS = [['inv', 'Инв. №'], ['name', 'Наименование'], ['cat', 'Категория'], ['mol', 'МОЛ'], ['loc', 'Локация'], ['status', 'Статус'], ['acc', 'Принят к учёту']];
+function sortVal(a, k) {
+  switch (k) {
+    case 'inv': return a.inventory_number; case 'name': return a.name.toLowerCase(); case 'cat': return catName(a.category);
+    case 'mol': return a.responsible_person ? empFio(a.responsible_person) : '￿'; case 'loc': return a.location ? locName(a.location) : '￿';
+    case 'status': return STATUS_ORDER.indexOf(a.status); case 'acc': return a.accounting_date || '0';
+  }
+}
+function filteredAssets() {
+  const c = idx(), q = R.q.trim().toLowerCase();
+  const list = S.assets.filter(a => {
+    if (R.cat && a.category !== R.cat) return false;
+    if (R.status && a.status !== R.status) return false;
+    if (R.mol && a.responsible_person !== R.mol) return false;
+    if (R.dept) { const e = c.emp.get(a.responsible_person); if (!e || e.dept !== R.dept) return false; }
+    if (R.loc && a.location !== R.loc) return false;
+    if (R.special && !SPECIAL[R.special].test(a)) return false;
+    if (q && ![a.inventory_number, a.name, a.serial_number, a.manufacturer, a.model].join(' ').toLowerCase().includes(q)) return false;
+    return true;
+  });
+  const k = R.sort, d = R.dir;
+  list.sort((x, y) => { const a = sortVal(x, k), b = sortVal(y, k); return (typeof a === 'number' ? a - b : String(a).localeCompare(String(b), 'ru')) * d || x.inventory_number.localeCompare(y.inventory_number); });
+  return list;
+}
+function buildRegHead() {
+  $('#regHead').innerHTML = `<tr><th class="c-chk"><input type="checkbox" class="chk-inp" id="selAll" aria-label="Выбрать все на странице"></th>${REG_COLS.map(([k, l]) => `<th ${k === 'acc' ? 'class="num"' : ''} aria-sort="none" data-col="${k}"><button class="th-sort" type="button" data-sort="${k}">${l}<span class="arr">${icon('sort', 12)}</span></button></th>`).join('')}<th class="c-act"><span class="sr" aria-label="Действия"></span></th></tr>`;
+}
+function warrTag(a) { return SPECIAL.warranty.test(a) ? `<span class="tag tag-warn" title="Гарантия истекает">гарантия до ${fmtD(a.warranty_until)}</span>` : ''; }
+function molCell(a) { const e = emp(a.responsible_person); if (!e) return '<span class="muted">—</span>'; return esc(empShort(a.responsible_person)) + (e.active ? '' : ' <span class="tag tag-danger">уволен</span>'); }
+function renderRegistry() {
+  const list = filteredAssets(), total = list.length, pages = Math.max(1, Math.ceil(total / R.size));
+  if (R.page > pages) R.page = pages;
+  const slice = list.slice((R.page - 1) * R.size, R.page * R.size);
+  document.querySelectorAll('#regHead th[data-col]').forEach(th => { const on = th.dataset.col === R.sort; th.setAttribute('aria-sort', on ? (R.dir > 0 ? 'ascending' : 'descending') : 'none'); const b = th.querySelector('.th-sort'); on ? b.setAttribute('data-active', '') : b.removeAttribute('data-active'); b.querySelector('.arr').innerHTML = icon(on ? (R.dir > 0 ? 'chevD' : 'chevD') : 'sort', 12); b.querySelector('.arr').style.transform = on && R.dir < 0 ? 'rotate(180deg)' : ''; });
+  $('#regBody').innerHTML = slice.length ? slice.map(a => `<tr tabindex="0" data-open="${a.id}">
+    <td class="c-chk"><input type="checkbox" class="chk-inp" data-sel="${a.id}" ${R.sel.has(a.id) ? 'checked' : ''} aria-label="Выбрать ${a.inventory_number}"></td>
+    <td class="mono">${esc(a.inventory_number)}</td>
+    <td class="c-name">${esc(a.name)}${warrTag(a)}<div class="sub">${a.serial_number ? 'S/N ' + esc(a.serial_number) : ''}</div></td>
+    <td>${esc(catName(a.category))}</td><td>${molCell(a)}</td><td>${a.location ? esc(locName(a.location)) : '<span class="muted">—</span>'}</td>
+    <td>${badge(a.status)}</td><td class="num">${fmtD(a.accounting_date)}</td>
+    <td class="c-act"><button class="icon-btn" type="button" data-menu="${a.id}" aria-label="Действия с ${a.inventory_number}" aria-haspopup="menu">${icon('more', 18)}</button></td></tr>`).join('')
+    : `<tr><td colspan="9" class="empty">Активы не найдены. Измените условия поиска или фильтры.</td></tr>`;
+  $('#regCards').innerHTML = slice.length ? slice.map(a => `<div class="a-card" data-open="${a.id}" tabindex="0">
+    <div class="top"><label class="chk"><input type="checkbox" data-sel="${a.id}" ${R.sel.has(a.id) ? 'checked' : ''} aria-label="Выбрать"><span class="mono">${esc(a.inventory_number)}</span></label>${badge(a.status)}</div>
+    <div class="nm">${esc(a.name)}${warrTag(a)}</div>
+    <div class="sub">${esc(catName(a.category))} · МОЛ: ${molCell(a)} · ${esc(a.location ? locName(a.location) : '—')}</div>
+    <div class="top"><span class="sub">Принят: ${fmtD(a.accounting_date)}</span><button class="icon-btn" type="button" data-menu="${a.id}" aria-label="Действия">${icon('more', 18)}</button></div></div>`).join('')
+    : `<div class="empty">Активы не найдены</div>`;
+  const allOn = slice.length && slice.every(a => R.sel.has(a.id)); const sa = $('#selAll'); if (sa) { sa.checked = !!allOn; sa.indeterminate = !allOn && slice.some(a => R.sel.has(a.id)); }
+  $('#regCount').textContent = `Найдено: ${total} из ${S.assets.length}`;
+  $('#pager').innerHTML = `<label class="pg">Строк на странице <select id="pgSize" aria-label="Строк на странице">${opt([[25, '25'], [50, '50'], [100, '100']], R.size)}</select></label>
+    <div class="pg"><button class="icon-btn" type="button" data-page="${R.page - 1}" ${R.page <= 1 ? 'disabled' : ''} aria-label="Предыдущая страница">${icon('chevL', 18)}</button><span>Стр. ${R.page} из ${pages}</span><button class="icon-btn" type="button" data-page="${R.page + 1}" ${R.page >= pages ? 'disabled' : ''} aria-label="Следующая страница">${icon('chevR', 18)}</button></div>`;
+  // Чипы активных фильтров
+  const chips = [];
+  if (R.special) chips.push(['special', SPECIAL[R.special].short]);
+  if (R.status) chips.push(['status', 'Статус: ' + STATUSES[R.status].label]);
+  if (R.cat) chips.push(['cat', 'Категория: ' + catName(R.cat)]);
+  if (R.mol) chips.push(['mol', 'МОЛ: ' + empShort(R.mol)]);
+  if (R.dept) chips.push(['dept', 'Подразделение: ' + deptName(R.dept)]);
+  if (R.loc) chips.push(['loc', 'Локация: ' + locName(R.loc)]);
+  $('#chips').innerHTML = chips.map(([k, l]) => `<span class="chip">${esc(l)}<button type="button" data-chip="${k}" aria-label="Убрать фильтр">${icon('x', 12)}</button></span>`).join('');
+  // Панель массовых операций
+  for (const id of [...R.sel]) if (!idx().asset.has(id)) R.sel.delete(id);
+  const bulk = $('#bulk');
+  if (R.sel.size) { bulk.hidden = false; bulk.innerHTML = `<b>Выбрано: ${R.sel.size}</b><button class="btn btn-secondary btn-sm" type="button" data-bulk="issue">Выдать</button><button class="btn btn-secondary btn-sm" type="button" data-bulk="move">Переместить</button><button class="btn btn-secondary btn-sm" type="button" data-bulk="return">Вернуть на склад</button><button class="btn btn-text btn-sm" type="button" data-bulk="clear">Снять выделение</button>`; }
+  else bulk.hidden = true;
+}
+function renderKPI() {
+  const counts = Object.fromEntries(STATUS_ORDER.map(s => [s, 0])); S.assets.forEach(a => counts[a.status]++);
+  const card = (key, label, val, color, active) => `<button type="button" class="kpi-card ${active ? 'active' : ''}" data-kpi="${key}" aria-pressed="${active}"><span class="k-label">${color ? `<span class="dot" style="background:${color}"></span>` : ''}${label}</span><span class="k-val">${val.toLocaleString('ru-RU')}</span></button>`;
+  const noFilter = !R.status && !R.special;
+  const warn = Object.entries(SPECIAL).map(([k, s]) => { const n = S.assets.filter(s.test).length; return `<button type="button" class="kpi-card alert ${n ? '' : 'zero'} ${R.special === k ? 'active' : ''}" data-kpi="special:${k}" aria-pressed="${R.special === k}"><span class="k-ic">${icon(s.icon, 18)}</span><span><span class="k-label">${s.label}</span><span class="k-val">${n}</span></span></button>`; }).join('');
+  $('#kpi').innerHTML = `<div class="kpi-row">${card('status:', 'Всего активов', S.assets.length, '', noFilter)}${STATUS_ORDER.map(s => card('status:' + s, STATUSES[s].label, counts[s], STATUSES[s].color, R.status === s)).join('')}</div><div class="kpi-row warn">${warn}</div>`;
+}
+function refreshFilterOptions() {
+  const set = (id, html, val) => { const el = $(id); el.innerHTML = html; el.value = val || ''; };
+  set('#fCat', opt(S.categories.map(x => [x.id, x.name]), R.cat, 'Категория: все'), R.cat);
+  set('#fStatus', opt(STATUS_ORDER.map(s => [s, STATUSES[s].label]), R.status, 'Статус: все'), R.status);
+  set('#fMol', opt(molList(true), R.mol, 'МОЛ: все'), R.mol);
+  set('#fDept', opt(S.departments.map(x => [x.id, x.name]), R.dept, 'Подразделение: все'), R.dept);
+  set('#fLoc', opt(S.locations.map(x => [x.id, x.name]), R.loc, 'Локация: все'), R.loc);
+  set('#rpDept', opt(S.departments.map(x => [x.id, x.name]), RP.dept, 'Подразделение: все'), RP.dept);
+  set('#rpLoc', opt(S.locations.map(x => [x.id, x.name]), RP.loc, 'Локация: все'), RP.loc);
+  set('#rpCat', opt(S.categories.map(x => [x.id, x.name]), RP.cat, 'Категория: все'), RP.cat);
+  for (const id of [...RP.mols]) if (!idx().emp.has(id)) RP.mols.delete(id);
+  msel($('#rpMols'), { options: molList(true), selected: RP.mols, summary: s => s.size ? `МОЛ: ${s.size}` : 'МОЛ: все', onChange: reportChanged });
+}
+function syncFilterControls() { $('#fCat').value = R.cat; $('#fStatus').value = R.status; $('#fMol').value = R.mol; $('#fDept').value = R.dept; $('#fLoc').value = R.loc; }
+
+/* ---------- Меню действий ---------- */
+function openMenu(btn, id) {
+  const a = idx().asset.get(id), menu = $('#menu'); if (!a) return;
+  const ops = allowedOps(a);
+  menu.innerHTML = `<button type="button" role="menuitem" data-mact="open">Открыть карточку</button>${ops.length ? '<hr><div class="mh">Операции</div>' : ''}${ops.map(o => `<button type="button" role="menuitem" data-mact="${o}">${OPS[o].label}</button>`).join('')}${!ops.length ? '<div class="mh">Операции недоступны</div>' : ''}`;
+  menu.dataset.id = id; menu.hidden = false;
+  const r = btn.getBoundingClientRect(), mh = menu.offsetHeight, mw = menu.offsetWidth;
+  menu.style.left = Math.max(8, Math.min(window.innerWidth - mw - 8, r.right - mw)) + 'px';
+  menu.style.top = (r.bottom + mh + 8 > window.innerHeight ? Math.max(8, r.top - mh - 4) : r.bottom + 4) + 'px';
+  menu.querySelector('button').focus();
+}
+const closeMenu = () => { $('#menu').hidden = true; };
+
+/* ---------- Карточка актива (drawer) ---------- */
+const DR = { id: null, tab: 'info' };
+function openAsset(id, tab) { DR.id = id; DR.tab = tab || 'info'; $('#overlay').hidden = false; $('#drawer').hidden = false; renderDrawer(); setTimeout(() => { const b = $('#drawer .icon-btn'); b && b.focus(); }, 20); }
+function closeDrawer() { DR.id = null; $('#overlay').hidden = true; $('#drawer').hidden = true; }
+function renderDrawer() {
+  const a = idx().asset.get(DR.id); if (!a) return closeDrawer();
+  const ops = allowedOps(a), st = stornoTarget(a), movs = idx().mov.get(a.id) || [];
+  const dr = $('#drawer');
+  dr.innerHTML = `<div class="dr-h"><div><div class="mono dr-inv">Инв. № ${esc(a.inventory_number)}</div><h3>${esc(a.name)}</h3>${badge(a.status)} ${warrTag(a)}</div><button class="icon-btn" type="button" data-drclose aria-label="Закрыть карточку">${icon('x', 18)}</button></div>
+  <div class="tabs" role="tablist"><button type="button" role="tab" data-tab="info" aria-selected="${DR.tab === 'info'}">Сведения</button><button type="button" role="tab" data-tab="hist" aria-selected="${DR.tab === 'hist'}">История (${movs.length})</button></div>
+  <div class="dr-b" role="tabpanel">${DR.tab === 'info' ? infoHTML(a) : histHTML(a)}</div>
+  <div class="dr-f">${ops.map(o => `<button class="btn btn-secondary btn-sm" type="button" data-op="${o}">${OPS[o].label}</button>`).join('')}${st ? `<button class="btn btn-text btn-sm" type="button" data-storno title="Отменить последнюю операцию">${icon('undo')} Сторно</button>` : ''}${a.status === 'disposed' ? '<span class="muted">Жизненный цикл завершён — операции недоступны</span>' : ''}</div>`;
+  if (DR.tab === 'info') {
+    const fields = assetFields('edit', a), form = dr.querySelector('#assetForm'), btn = dr.querySelector('[data-savea]');
+    const ctl = bindForm(form, fields, v => validateAsset(v, a), btn);
+    btn.onclick = () => {
+      const { v, errs } = ctl.all(); if (Object.keys(errs).length) return;
+      const before = JSON.stringify(assetVals(a));
+      assetFromForm(a, v);
+      if (a.status === 'received') a.inventory_number = v.inventory_number;
+      if ('depreciation_start_date' in v && v.depreciation_start_date !== a.depreciation_start_date) { a.depreciation_start_date = v.depreciation_start_date; a.depr_start_reason = v.depr_start_reason; }
+      if (JSON.stringify(assetVals(a)) !== before) { S.audit.push({ id: uid(), asset_id: a.id, at: nowStamp(), by: USER, text: 'Изменены сведения карточки' + ('depreciation_start_date' in v && v.depr_start_reason && JSON.parse(before).depreciation_start_date !== a.depreciation_start_date ? `; дата начала амортизации: ${fmtD(a.depreciation_start_date)} (основание: ${v.depr_start_reason})` : '') }); save(); toast('Сведения сохранены'); refreshAll(); }
+      else toast('Изменений нет');
+    };
+  }
+}
+function infoHTML(a) {
+  const d = depr(a, TODAY), e = emp(a.responsible_person);
+  const rc = remainCell(d), rs = residCell(d);
+  return `<dl class="dl">
+    <dt>Статус</dt><dd>${badge(a.status)}</dd>
+    <dt>МОЛ</dt><dd>${e ? esc(empFull(a.responsible_person)) + (e.active ? '' : ' <span class="tag tag-danger">уволен</span>') : '<span class="muted">не назначен</span>'}</dd>
+    <dt>Локация</dt><dd>${esc(locName(a.location))}</dd>
+    <dt>Дата поступления</dt><dd>${fmtD(regDate(a))}</dd>
+    <dt>Дата принятия к учёту</dt><dd>${fmtD(a.accounting_date)}</dd>
+    <dt>Способ амортизации</dt><dd>${a.low_value ? 'Не начисляется (малоценное)' : esc(a.depreciation_method || 'Линейный')}</dd>
+    <dt>Начало амортизации</dt><dd>${fmtD(a.depreciation_start_date)}${a.depr_start_reason ? `<div class="sub">Изменено: ${esc(a.depr_start_reason)}</div>` : ''}</dd>
+    <dt>Оставшийся срок на ${fmtD(TODAY)}</dt><dd>${rc.h}</dd>
+    <dt>Остаточная стоимость на ${fmtD(TODAY)}</dt><dd>${rs.h}</dd>
+  </dl>
+  <h4>Справочные сведения</h4>
+  <form class="form-grid" id="assetForm" novalidate>${formHTML(assetFields('edit', a), assetVals(a))}</form>
+  <div class="row-actions"><button class="btn btn-primary btn-sm" type="button" data-savea>Сохранить изменения</button></div>`;
+}
+function histHTML(a) {
+  const c = idx(), movs = [...(c.mov.get(a.id) || [])].reverse();
+  const audits = (S.audit || []).filter(x => x.asset_id === a.id).reverse();
+  const flow = (f, t, fn) => (f || t) && f !== t ? `${esc(fn(f))} → ${esc(fn(t))}` : esc(fn(t || f));
+  const items = movs.map(m => {
+    const canc = c.stornoed.has(m.id);
+    return `<li class="${m.operation_type === 'storno' ? 'storno' : ''} ${canc ? 'cancelled' : ''}"><div class="t-h"><span class="t-date">${fmtD(m.operation_date)}</span><span class="t-op">${OPS[m.operation_type].label}</span>${canc ? '<span class="tag tag-danger">сторнирована</span>' : ''}</div>
+      <div class="t-line">${m.status_from ? badge(m.status_from) + ' ' + icon('arrow', 12) + ' ' : ''}${badge(m.status_to)}</div>
+      ${(m.mol_from || m.mol_to) ? `<div class="t-line">МОЛ: ${flow(m.mol_from, m.mol_to, empShort)}</div>` : ''}
+      ${(m.location_from || m.location_to) ? `<div class="t-line">Локация: ${flow(m.location_from, m.location_to, locName)}</div>` : ''}
+      ${m.document_ref ? `<div class="t-line">Документ: ${esc(m.document_ref)}</div>` : ''}
+      ${m.comment ? `<div class="t-line">${esc(m.comment)}</div>` : ''}
+      <div class="t-meta">Внесено: ${esc(m.created_by)}, ${fmtStamp(m.created_at)}</div></li>`;
+  }).join('');
+  const au = audits.map(x => `<li class="audit"><div class="t-h"><span class="t-date">${fmtStamp(x.at)}</span><span class="muted">${esc(x.text)}</span></div><div class="t-meta">${esc(x.by)}</div></li>`).join('');
+  return `<ul class="tl">${items || '<li>Событий нет</li>'}</ul>${au ? `<h4>Журнал изменений сведений</h4><ul class="tl">${au}</ul>` : ''}`;
+}
+
+/* ---------- Мультивыбор ---------- */
+function closeAllMsel() { document.querySelectorAll('.msel-panel').forEach(p => { p.hidden = true; const b = p.previousElementSibling; b && b.setAttribute('aria-expanded', 'false'); }); }
+function msel(el, { options, selected, summary, onChange }) {
+  el.innerHTML = `<button type="button" class="btn btn-secondary msel-btn" aria-haspopup="true" aria-expanded="false"><span></span>${icon('chevD', 14)}</button><div class="msel-panel" hidden>${options.map(([v, l, dis]) => `<label class="chk"><input type="checkbox" value="${esc(v)}" ${selected.has(v) || dis ? 'checked' : ''} ${dis ? 'disabled' : ''}> ${esc(l)}</label>`).join('')}<div class="msel-foot"><button type="button" class="btn btn-text btn-sm" data-all>Выбрать все</button><button type="button" class="btn btn-text btn-sm" data-none>Сбросить</button></div></div>`;
+  const btn = el.querySelector('.msel-btn'), panel = el.querySelector('.msel-panel');
+  const upd = () => { btn.querySelector('span').textContent = summary(selected); };
+  btn.onclick = e => { e.stopPropagation(); const open = panel.hidden; closeAllMsel(); panel.hidden = !open; btn.setAttribute('aria-expanded', String(open)); };
+  panel.addEventListener('click', e => e.stopPropagation());
+  panel.addEventListener('change', e => { const cb = e.target; if (cb.checked) selected.add(cb.value); else selected.delete(cb.value); upd(); onChange(); });
+  panel.querySelector('[data-all]').onclick = () => { panel.querySelectorAll('input:not(:disabled)').forEach(cb => { cb.checked = true; selected.add(cb.value); }); upd(); onChange(); };
+  panel.querySelector('[data-none]').onclick = () => { panel.querySelectorAll('input:not(:disabled)').forEach(cb => { cb.checked = false; selected.delete(cb.value); }); upd(); onChange(); };
+  upd();
+}
+
+/* ---------- Отчёт по движению (раздел 7) ---------- */
+const RP = { from: '', to: '', preset: 'month', types: new Set(), mols: new Set(), dept: '', loc: '', cat: '', depr: 'all', visible: new Set(['spi', 'resid', 'date', 'op', 'from', 'to', 'st', 'doc']) };
+const RCOLS = [
+  { k: 'n', label: '№ п/п', req: true, w: 6 }, { k: 'name', label: 'Наименование', req: true, w: 36 }, { k: 'inv', label: 'Инвентарный номер', req: true, w: 12 },
+  { k: 'mol', label: 'Материально-ответственное лицо', req: true, w: 40 }, { k: 'acc', label: 'Дата принятия к учёту', req: true, w: 14 },
+  { k: 'remain', label: 'Оставшийся срок амортизации', req: true, w: 26 }, { k: 'spi', label: 'СПИ, мес.', w: 10 }, { k: 'resid', label: 'Остаточная стоимость, ₸', w: 18 },
+  { k: 'date', label: 'Дата операции', w: 12 }, { k: 'op', label: 'Вид операции', w: 22 }, { k: 'from', label: 'Откуда (МОЛ / локация)', w: 36 },
+  { k: 'to', label: 'Куда (МОЛ / локация)', w: 36 }, { k: 'st', label: 'Статус после операции', w: 16 }, { k: 'doc', label: 'Документ-основание', w: 32 }
+];
+const visCols = () => RCOLS.filter(c => c.req || RP.visible.has(c.k));
+function setPreset(p) {
+  const d = parseISO(TODAY), y = d.getFullYear(), mo = d.getMonth();
+  if (p === 'month') { RP.from = toISO(new Date(y, mo, 1)); RP.to = TODAY; }
+  if (p === 'prev') { RP.from = toISO(new Date(y, mo - 1, 1)); RP.to = toISO(new Date(y, mo, 0)); }
+  if (p === 'quarter') { RP.from = toISO(new Date(y, Math.floor(mo / 3) * 3, 1)); RP.to = TODAY; }
+  if (p === 'year') { RP.from = toISO(new Date(y, 0, 1)); RP.to = TODAY; }
+  RP.preset = p; $('#rpFrom').value = RP.from; $('#rpTo').value = RP.to;
+  document.querySelectorAll('[data-preset]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.preset === p)));
+}
+function periodError() {
+  if (!RP.from || !RP.to) return 'Укажите период: дату «с» и дату «по»';
+  if (RP.from > RP.to) return 'Дата «с» не может быть позже даты «по»';
+  if (RP.to > TODAY) return 'Период не может заканчиваться в будущем';
+  return '';
+}
+function buildReport() {
+  const c = idx(), rows = [], dc = new Map();
+  const dOf = a => { if (!dc.has(a.id)) dc.set(a.id, depr(a, RP.to)); return dc.get(a.id); };
+  for (const m of c.sorted) {
+    if (m.operation_date < RP.from || m.operation_date > RP.to) continue;
+    const a = c.asset.get(m.asset_id); if (!a) continue;
+    if (RP.types.size && !RP.types.has(m.operation_type)) continue;
+    if (RP.mols.size && !RP.mols.has(m.mol_to) && !RP.mols.has(m.mol_from)) continue;
+    if (RP.dept) { const e = c.emp.get(m.mol_to); if (!e || e.dept !== RP.dept) continue; }
+    if (RP.loc && m.location_to !== RP.loc && m.location_from !== RP.loc) continue;
+    if (RP.cat && a.category !== RP.cat) continue;
+    const d = dOf(a);
+    if (RP.depr !== 'all') {
+      if (d.kind !== 'ok') continue;
+      if (RP.depr === 'le6' && !(d.remain > 0 && d.remain <= 6)) continue;
+      if (RP.depr === 'le12' && !(d.remain > 0 && d.remain <= 12)) continue;
+      if (RP.depr === 'zero' && d.remain !== 0) continue;
+    }
+    rows.push({ m, a, d, canc: c.stornoed.has(m.id) });
+  }
+  rows.sort((x, y) => x.m.operation_date.localeCompare(y.m.operation_date) || x.a.inventory_number.localeCompare(y.a.inventory_number) || x.m.seq - y.m.seq);
+  return rows;
+}
+function mlText(mol, loc) { if (!mol && !loc) return '—'; return `${mol ? empShort(mol) : '—'} / ${loc ? locName(loc) : '—'}`; }
+function rcell(k, row, i) {
+  const { m, a, d } = row;
+  switch (k) {
+    case 'n': return { h: i + 1, t: String(i + 1), v: i + 1 };
+    case 'name': return { h: esc(a.name), t: a.name, wrap: 1 };
+    case 'inv': return { h: `<span class="mono">${esc(a.inventory_number)}</span>`, t: a.inventory_number };
+    case 'mol': { const t = m.mol_to ? empFull(m.mol_to) : '—'; return { h: esc(t), t, wrap: 1 }; }
+    case 'acc': return { h: fmtD(a.accounting_date), t: fmtD(a.accounting_date) };
+    case 'remain': return remainCell(d);
+    case 'spi': return a.low_value ? { h: '—', t: '—' } : a.useful_life_months ? { h: a.useful_life_months, t: String(a.useful_life_months), v: +a.useful_life_months } : { h: '<span class="nd">Не задан</span>', t: 'Не задан' };
+    case 'resid': return residCell(d);
+    case 'date': return { h: fmtD(m.operation_date), t: fmtD(m.operation_date) };
+    case 'op': { const t = OPS[m.operation_type].label + (row.canc ? ' (сторнирована)' : ''); return { h: esc(OPS[m.operation_type].label) + (row.canc ? ' <span class="tag tag-danger">сторнирована</span>' : ''), t }; }
+    case 'from': { const t = mlText(m.mol_from, m.location_from); return { h: esc(t), t }; }
+    case 'to': { const t = mlText(m.mol_to, m.location_to); return { h: esc(t), t }; }
+    case 'st': return { h: badge(m.status_to), t: m.status_to ? STATUSES[m.status_to].label : '—' };
+    case 'doc': { const t = m.document_ref || '—'; return { h: esc(t), t, wrap: 1 }; }
+  }
+}
+function calcTotals() {
+  const c = idx(), before = addDays(RP.from, -1);
+  const T = { open: { n: 0, s: 0 }, close: { n: 0, s: 0 }, recv: { n: 0, s: 0 }, disp: { n: 0, s: 0 }, util: 0, internal: {}, internalN: 0, resid: 0, full: 0, le6: 0, missing: 0, low: 0 };
+  for (const a of S.assets) {
+    if (RP.cat && a.category !== RP.cat) continue;
+    const cost = +a.cost || 0, s0 = statusAt(a.id, before), s1 = statusAt(a.id, RP.to);
+    if (ON_BOOKS.includes(s0)) { T.open.n++; T.open.s += cost; }
+    if (ON_BOOKS.includes(s1)) {
+      T.close.n++; T.close.s += cost;
+      const d = depr(a, RP.to);
+      if (d.kind === 'na') T.low++; else if (d.kind === 'missing') T.missing++;
+      else if (d.kind === 'ok') { T.resid += d.residual; if (d.remain === 0) T.full++; else if (d.remain <= 6) T.le6++; }
+    }
+    for (const m of c.eff.get(a.id) || []) {
+      if (m.operation_date < RP.from || m.operation_date > RP.to) continue;
+      if (m.operation_type === 'accept') { T.recv.n++; T.recv.s += cost; }
+      else if (m.operation_type === 'writeoff' && ON_BOOKS.includes(m.status_from)) { T.disp.n++; T.disp.s += cost; }
+      else if (m.operation_type === 'dispose') T.util++;
+      else if (INTERNAL.includes(m.operation_type)) { T.internal[m.operation_type] = (T.internal[m.operation_type] || 0) + 1; T.internalN++; }
+    }
+  }
+  T.check = T.open.n + T.recv.n - T.disp.n === T.close.n && Math.abs(T.open.s + T.recv.s - T.disp.s - T.close.s) < 0.01;
+  return T;
+}
+function totalsList(T) {
+  const internal = INTERNAL.filter(k => T.internal[k]).map(k => `${OPS[k].label.toLowerCase()} — ${T.internal[k]}`).join('; ');
+  return [
+    [`Остаток на начало периода (${fmtD(RP.from)})`, `${T.open.n} шт.`, fmtMoney(T.open.s)],
+    ['Поступило за период (принято к учёту)', `${T.recv.n} шт.`, fmtMoney(T.recv.s)],
+    ['Выбыло за период (списано)', `${T.disp.n} шт.`, fmtMoney(T.disp.s)],
+    [`Остаток на конец периода (${fmtD(RP.to)})`, `${T.close.n} шт.`, fmtMoney(T.close.s)],
+    ['Внутренние перемещения (выдачи, перемещения, возвраты, ремонты, резерв)', `${T.internalN} операций`, internal || '—'],
+    ['Утилизировано за период', `${T.util} шт.`, ''],
+    [`Проверка: ${T.open.n} + ${T.recv.n} − ${T.disp.n} = ${T.close.n}`, T.check ? 'Сходится' : 'Не сходится', ''],
+    [`Суммарная остаточная стоимость на ${fmtD(RP.to)}`, fmtMoney(T.resid), ''],
+    ['Полностью самортизировано', `${T.full} шт.`, ''],
+    ['С остатком срока ≤ 6 мес.', `${T.le6} шт.`, ''],
+    ['СПИ или стоимость не заданы', `${T.missing} шт.`, ''],
+    ['Малоценные (амортизация не рассчитывается)', `${T.low} шт.`, '']
+  ];
+}
+function totalsHTML(T) {
+  const tot = (l, v, s) => `<div class="tot"><div class="t-l">${l}</div><div class="t-v">${v}</div>${s ? `<div class="t-s">${s}</div>` : ''}</div>`;
+  const internal = INTERNAL.filter(k => T.internal[k]).map(k => `${OPS[k].label}: ${T.internal[k]}`).join(' · ');
+  return `<div class="totals"><h3>Итоги за период</h3><div class="hint" style="margin-bottom:12px">Остатки рассчитаны по активам, принятым к учёту${RP.cat ? `, категория «${esc(catName(RP.cat))}»` : ''}.</div>
+    <div class="tot-grid">${tot(`Остаток на начало (${fmtD(RP.from)})`, `${T.open.n} шт.`, fmtMoney(T.open.s))}${tot('Поступило (принято к учёту)', `+ ${T.recv.n} шт.`, fmtMoney(T.recv.s))}${tot('Выбыло (списано)', `− ${T.disp.n} шт.`, fmtMoney(T.disp.s))}${tot(`Остаток на конец (${fmtD(RP.to)})`, `${T.close.n} шт.`, fmtMoney(T.close.s))}</div>
+    <div class="tot-check ${T.check ? 'ok' : 'bad'}">${icon(T.check ? 'check' : 'alert')} Проверка: ${T.open.n} + ${T.recv.n} − ${T.disp.n} = ${T.close.n} — ${T.check ? 'сходится' : 'не сходится'}</div>
+    <div class="tot-grid" style="margin-top:12px">${tot('Внутренние перемещения', `${T.internalN} операций`, internal || '—')}${tot('Утилизировано за период', `${T.util} шт.`, '')}</div>
+    <h4>Амортизация на ${fmtD(RP.to)}</h4>
+    <div class="tot-grid">${tot('Суммарная остаточная стоимость', fmtMoney(T.resid), '')}${tot('Полностью самортизировано', `${T.full} шт.`, '')}${tot('Остаток срока ≤ 6 мес.', `${T.le6} шт.`, '')}${tot('СПИ или стоимость не заданы', `<span class="${T.missing ? 'nd' : ''}">${T.missing} шт.</span>`, '')}${tot('Малоценные (без амортизации)', `${T.low} шт.`, '')}</div></div>`;
+}
+function renderReport() {
+  const err = periodError(); $('#rpErr').textContent = err;
+  if (err) { $('#rpOut').innerHTML = ''; $('#rpMeta').textContent = ''; return null; }
+  const rows = buildReport(), T = calcTotals(), cols = visCols();
+  $('#rpMeta').textContent = `Период ${fmtD(RP.from)} – ${fmtD(RP.to)} · операций: ${rows.length} · амортизация рассчитана на ${fmtD(RP.to)}`;
+  const table = rows.length ? `<div class="table-wrap rp-wrap"><table class="tbl"><thead><tr>${cols.map(c => `<th>${c.label}</th>`).join('')}</tr></thead><tbody>${rows.map((r, i) => `<tr class="${r.canc ? 'cancelled' : ''}">${cols.map(c => { const x = rcell(c.k, r, i); return `<td class="${x.wrap ? 'wrap' : ''} ${x.v != null && c.k !== 'n' ? 'num' : ''}">${x.h}</td>`; }).join('')}</tr>`).join('')}</tbody></table></div>`
+    : `<div class="empty-box">За выбранный период движений не найдено</div>`;
+  $('#rpOut').innerHTML = table + totalsHTML(T);
+  return { rows, T, cols };
+}
+function reportChanged() { renderReport(); }
+const fileName = ext => `Движение_активов_${fmtD(RP.from)}-${fmtD(RP.to)}.${ext}`;
+function download(blob, name) { const u = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 2000); }
+function reportTextData() {
+  const r = renderReport(); if (!r) { toast('Проверьте период отчёта', true); return null; }
+  const head = r.cols.map(c => c.label);
+  const body = r.rows.map((row, i) => r.cols.map(c => rcell(c.k, row, i)));
+  return { ...r, head, body };
+}
+function exportCsv() {
+  const d = reportTextData(); if (!d) return;
+  const q = s => { s = String(s ?? ''); return /[;"\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+  const lines = [[S.org], [`Отчёт по движению активов за период ${fmtD(RP.from)} – ${fmtD(RP.to)}`], [`Дата формирования: ${fmtD(TODAY)}`], [], d.head, ...d.body.map(r => r.map(x => x.t)), [], ['Итоги'], ...totalsList(d.T)];
+  if (!d.rows.length) lines.splice(5, 0, ['За выбранный период движений не найдено']);
+  download(new Blob(['﻿' + lines.map(r => r.map(q).join(';')).join('\r\n')], { type: 'text/csv;charset=utf-8' }), fileName('csv'));
+}
+function loadScript(src) { return new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = rej; document.head.appendChild(s); }); }
+async function exportXlsx() {
+  const d = reportTextData(); if (!d) return;
+  try {
+    if (!window.XLSX) await loadScript(XLSX_URL);
+    const aoa = [[S.org], [`Отчёт по движению активов за период ${fmtD(RP.from)} – ${fmtD(RP.to)}`], [`Дата формирования: ${fmtD(TODAY)}`], [], d.head,
+      ...(d.rows.length ? d.body.map(r => r.map(x => x.v != null ? x.v : x.t)) : [['За выбранный период движений не найдено']]), [], ['Итоги'], ...totalsList(d.T)];
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
+    ws['!cols'] = d.cols.map(c => ({ wch: c.w }));
+    ws['!autofilter'] = { ref: XLSX.utils.encode_range({ s: { r: 4, c: 0 }, e: { r: 4 + Math.max(1, d.rows.length), c: d.cols.length - 1 } }) };
+    ws['!views'] = [{ state: 'frozen', ySplit: 5 }];
+    const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Движение активов');
+    XLSX.writeFile(wb, fileName('xlsx'));
+  } catch (e) {
+    // Резервный вариант без сети: книга Excel в формате HTML
+    const html = `<html><head><meta charset="utf-8"></head><body>${printableHTML(d)}</body></html>`;
+    download(new Blob(['﻿' + html], { type: 'application/vnd.ms-excel' }), fileName('xls'));
+    toast('Нет доступа к библиотеке XLSX — сохранено в формате .xls', true);
+  }
+}
+function printableHTML(d) {
+  const body = d.rows.length ? `<table><thead><tr>${d.head.map(h => `<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${d.body.map(r => `<tr>${r.map(x => `<td>${esc(x.t)}</td>`).join('')}</tr>`).join('')}</tbody></table>` : '<div class="pd-empty">За выбранный период движений не найдено</div>';
+  return `<div class="pd-org">${esc(S.org)}</div><h1>Отчёт по движению активов</h1><div class="pd-meta">Период: ${fmtD(RP.from)} – ${fmtD(RP.to)} · Дата формирования: ${fmtD(TODAY)} · Оставшийся срок амортизации рассчитан на ${fmtD(RP.to)}</div>${body}
+    <table class="pd-tot"><tbody>${totalsList(d.T).map(r => `<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td></tr>`).join('')}</tbody></table>
+    <div class="pd-sign"><div>Ответственный:<span></span></div><div>Подпись:<span></span></div><div>Дата:<span style="min-width:120px"></span></div></div>`;
+}
+function doPrint() {
+  const d = reportTextData(); if (!d) return;
+  const pa = $('#printArea'); pa.innerHTML = `<div class="print-doc">${printableHTML(d)}</div>`;
+  document.body.classList.add('print-mode');
+  const done = () => { document.body.classList.remove('print-mode'); pa.innerHTML = ''; window.removeEventListener('afterprint', done); };
+  window.addEventListener('afterprint', done);
+  window.print(); setTimeout(done, 1500);
+}
+async function exportPdf() {
+  const d = reportTextData(); if (!d) return;
+  const btn = $('#exPdf'); btn.disabled = true;
+  try {
+    if (!window.html2pdf) await loadScript(H2P_URL);
+    const el = document.createElement('div'); el.className = 'print-doc pdf-doc'; el.innerHTML = printableHTML(d);
+    await html2pdf().set({ margin: [10, 8, 12, 8], filename: fileName('pdf'), image: { type: 'jpeg', quality: 0.95 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }, pagebreak: { mode: ['css', 'legacy'], avoid: 'tr' } }).from(el).save();
+  } catch (e) { toast('PDF-библиотека недоступна — выберите «Сохранить как PDF» в окне печати', true); doPrint(); }
+  finally { btn.disabled = false; }
+}
+
+/* ---------- Справочники ---------- */
+const DIR_TABS = [['emp', 'Сотрудники (МОЛ)'], ['departments', 'Подразделения'], ['locations', 'Локации'], ['categories', 'Категории'], ['reasons', 'Причины списания'], ['settings', 'Организация и данные']];
+function usage(key, id) {
+  if (key === 'departments') return S.employees.filter(e => e.dept === id).length;
+  if (key === 'categories') return S.assets.filter(a => a.category === id).length;
+  if (key === 'locations') return S.assets.filter(a => a.location === id).length + S.movements.filter(m => m.location_from === id || m.location_to === id).length;
+  if (key === 'reasons') return S.movements.filter(m => m.reason_id === id).length;
+  return 0;
+}
+function dirsChanged() { save(); refreshFilterOptions(); refreshAll(); }
+function openDirs(tab = 'emp') {
+  const m = openModal({ title: 'Справочники', wide: true, body: `<div class="tabs" role="tablist" style="padding:0">${DIR_TABS.map(([k, l]) => `<button type="button" role="tab" data-dtab="${k}">${l}</button>`).join('')}</div><div id="dirBody"></div>` });
+  const body = m.querySelector('#dirBody');
+  const show = k => { m.querySelectorAll('[data-dtab]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.dtab === k))); if (k === 'emp') renderEmp(body); else if (k === 'settings') renderSettings(body, m); else renderDict(body, k); };
+  m.querySelector('.tabs').addEventListener('click', e => { const b = e.target.closest('[data-dtab]'); if (b) show(b.dataset.dtab); });
+  show(tab);
+}
+function renderDict(body, key) {
+  const list = S[key];
+  body.innerHTML = `<div class="dict-add"><input id="dNew" placeholder="Новое значение" aria-label="Новое значение"><button class="btn btn-primary" type="button" id="dAdd">${icon('plus')} Добавить</button></div>
+    <div class="table-wrap"><table class="tbl"><thead><tr><th>Наименование</th><th class="num">Используется</th><th></th></tr></thead><tbody>${list.map(x => { const u = usage(key, x.id); return `<tr><td><input class="inline-inp" data-rename="${x.id}" value="${esc(x.name)}" aria-label="Наименование"></td><td class="num">${u}</td><td class="r"><button class="btn btn-text btn-sm" type="button" data-del="${x.id}" ${u ? 'disabled title="Значение используется — удаление невозможно"' : ''}>Удалить</button></td></tr>`; }).join('')}</tbody></table></div>`;
+  const add = () => { const v = body.querySelector('#dNew').value.trim(); if (!v) return; if (list.some(x => x.name.toLowerCase() === v.toLowerCase())) return toast('Такое значение уже есть', true); list.push({ id: uid(), name: v }); dirsChanged(); renderDict(body, key); toast('Добавлено'); };
+  body.querySelector('#dAdd').onclick = add;
+  body.querySelector('#dNew').addEventListener('keydown', e => { if (e.key === 'Enter') add(); });
+  body.querySelectorAll('[data-rename]').forEach(inp => inp.addEventListener('change', () => { const v = inp.value.trim(); const x = list.find(y => y.id === inp.dataset.rename); if (!v) { inp.value = x.name; return; } x.name = v; dirsChanged(); toast('Сохранено'); }));
+  body.querySelectorAll('[data-del]').forEach(b => b.onclick = () => { const i = list.findIndex(y => y.id === b.dataset.del); if (i >= 0 && confirm('Удалить значение справочника?')) { list.splice(i, 1); dirsChanged(); renderDict(body, key); } });
+}
+function renderEmp(body, editId) {
+  const cnt = id => S.assets.filter(a => a.responsible_person === id && !CLOSED.includes(a.status)).length;
+  const list = [...S.employees].sort((a, b) => (b.active - a.active) || a.fio.localeCompare(b.fio, 'ru'));
+  body.innerHTML = `<div class="dict-add" style="justify-content:space-between"><span class="hint">Уволенного сотрудника нельзя назначить МОЛ. При увольнении система предупреждает о закреплённых активах.</span><button class="btn btn-primary btn-sm" type="button" data-eadd>${icon('plus')} Сотрудник</button></div><div id="eForm"></div>
+    <div class="table-wrap"><table class="tbl"><thead><tr><th>ФИО</th><th>Таб. №</th><th>Должность</th><th>Подразделение</th><th>МОЛ</th><th>Статус</th><th class="num">Активов</th><th></th></tr></thead><tbody>${list.map(e => `<tr><td>${esc(e.fio)}</td><td class="mono">${esc(e.tab)}</td><td>${esc(e.position)}</td><td>${esc(deptName(e.dept))}</td><td>${e.isMol ? 'Да' : 'Нет'}</td><td>${e.active ? '<span class="badge b-success">Активен</span>' : '<span class="badge b-muted">Уволен</span>'}</td><td class="num">${cnt(e.id)}</td><td class="r"><button class="btn btn-text btn-sm" type="button" data-eedit="${e.id}">Изменить</button></td></tr>`).join('')}</tbody></table></div>`;
+  body.querySelector('[data-eadd]').onclick = () => empForm(body, null);
+  body.querySelectorAll('[data-eedit]').forEach(b => b.onclick = () => empForm(body, b.dataset.eedit));
+  if (editId) empForm(body, editId);
+}
+function empForm(body, id) {
+  const e = id ? S.employees.find(x => x.id === id) : null;
+  const fields = [{ k: 'fio', label: 'ФИО', type: 'text', req: true, full: true }, { k: 'tab', label: 'Табельный номер', type: 'text', req: true }, { k: 'position', label: 'Должность', type: 'text' }, { k: 'dept', label: 'Подразделение', type: 'dept', req: true }, { k: 'isMol', label: 'Материально-ответственное лицо', type: 'checkbox' }, { k: 'active', label: 'Активен (работает)', type: 'checkbox' }];
+  const box = body.querySelector('#eForm');
+  box.innerHTML = `<div class="emp-form"><h3 style="margin-bottom:16px">${e ? 'Редактирование сотрудника' : 'Новый сотрудник'}</h3><form class="form-grid" novalidate>${formHTML(fields, e || { isMol: true, active: true })}</form><div class="row-actions"><button class="btn btn-secondary btn-sm" type="button" data-ecancel>Отмена</button><button class="btn btn-primary btn-sm" type="button" data-esave>Сохранить</button></div></div>`;
+  const ok = box.querySelector('[data-esave]');
+  const ctl = bindForm(box.querySelector('form'), fields, v => { const er = {}; if (!v.fio) er.fio = 'Обязательное поле'; if (!v.tab) er.tab = 'Обязательное поле'; else if (S.employees.some(x => x.tab === v.tab && x.id !== id)) er.tab = 'Табельный номер уже используется'; if (!v.dept) er.dept = 'Обязательное поле'; return er; }, ok);
+  box.querySelector('[data-ecancel]').onclick = () => { box.innerHTML = ''; };
+  ok.onclick = () => {
+    const { v, errs } = ctl.all(); if (Object.keys(errs).length) return;
+    if (e && e.active && !v.active) { const n = S.assets.filter(a => a.responsible_person === e.id && !CLOSED.includes(a.status)).length; if (n && !confirm(`За сотрудником закреплено активов: ${n}. После увольнения их потребуется передать другому МОЛ (они попадут в предупреждение «Активы без МОЛ»). Продолжить?`)) return; }
+    if (e) Object.assign(e, v); else S.employees.push({ id: uid(), ...v });
+    dirsChanged(); renderEmp(body); toast('Сотрудник сохранён');
+  };
+  box.querySelector('input').focus();
+}
+function renderSettings(body, modal) {
+  body.innerHTML = `<div class="set-block"><h3>Организация</h3><p>Название выводится в шапке PDF, печатной формы и выгрузок.</p><div class="dict-add" style="margin:0"><input id="orgName" value="${esc(S.org)}" aria-label="Название организации"><button class="btn btn-primary" type="button" id="orgSave">Сохранить</button></div></div>
+    <div class="set-block"><h3>Резервная копия</h3><p>Данные хранятся в этом браузере. Регулярно сохраняйте резервную копию в файл JSON.</p><div class="sec-actions"><button class="btn btn-secondary" type="button" id="bkSave">${icon('download')} Скачать резервную копию</button><label class="btn btn-secondary">Восстановить из файла<input type="file" id="bkLoad" accept=".json,application/json" hidden></label></div></div>
+    <div class="set-block"><h3>Демонстрационные данные</h3><p>Удаляет все текущие данные и заново заполняет систему демонстрационным набором.</p><button class="btn btn-danger" type="button" id="rst">Сбросить к демо-данным</button></div>`;
+  body.querySelector('#orgSave').onclick = () => { const v = body.querySelector('#orgName').value.trim(); if (!v) return; S.org = v; save(); toast('Сохранено'); };
+  body.querySelector('#bkSave').onclick = () => download(new Blob([JSON.stringify(S, null, 1)], { type: 'application/json' }), `Резервная_копия_учёт_активов_${fmtD(TODAY)}.json`);
+  body.querySelector('#bkLoad').onchange = ev => {
+    const f = ev.target.files[0]; if (!f) return;
+    const rd = new FileReader(); rd.onload = () => {
+      try { const o = JSON.parse(rd.result); if (!Array.isArray(o.assets) || !Array.isArray(o.movements) || !Array.isArray(o.employees)) throw 0; if (!confirm('Заменить текущие данные данными из файла?')) return; S = o; S.audit = S.audit || []; R.sel.clear(); dirsChanged(); modal.close(); toast('Данные восстановлены'); }
+      catch (e) { toast('Файл не является резервной копией системы', true); }
+    }; rd.readAsText(f);
+  };
+  body.querySelector('#rst').onclick = () => { if (!confirm('Все текущие данные будут удалены. Продолжить?')) return; seed(); R.sel.clear(); dirsChanged(); modal.close(); closeDrawer(); toast('Загружены демо-данные'); };
+}
+
+/* ---------- Общее обновление ---------- */
+function refreshAll() { renderKPI(); renderRegistry(); if (DR.id) renderDrawer(); renderReport(); }
+
+/* ---------- События ---------- */
+function bindEvents() {
+  $('#logoIc').innerHTML = icon('laptop', 18); $('#gIc').innerHTML = icon('search'); $('#rqIc').innerHTML = icon('search');
+  $('#btnNew').innerHTML = icon('plus') + ' Новый актив'; $('#filtToggle').innerHTML = icon('filter') + ' Фильтры';
+  $('#exXlsx').innerHTML = icon('sheet') + ' Excel'; $('#exPdf').innerHTML = icon('file') + ' PDF'; $('#exCsv').innerHTML = icon('download') + ' CSV'; $('#exPrint').innerHTML = icon('printer') + ' Печать';
+  $('#btnNew').onclick = openNewAsset;
+  $('#navDirs').onclick = () => openDirs();
+  $('#rq').addEventListener('input', e => { R.q = e.target.value; R.page = 1; renderRegistry(); });
+  [['fCat', 'cat'], ['fStatus', 'status'], ['fMol', 'mol'], ['fDept', 'dept'], ['fLoc', 'loc']].forEach(([id, k]) => $('#' + id).addEventListener('change', e => { R[k] = e.target.value; R.page = 1; renderKPI(); renderRegistry(); }));
+  $('#fReset').onclick = () => { Object.assign(R, { q: '', cat: '', status: '', mol: '', dept: '', loc: '', special: '', page: 1 }); $('#rq').value = ''; syncFilterControls(); renderKPI(); renderRegistry(); };
+  $('#filtToggle').onclick = () => { const f = $('#filters'); f.classList.toggle('open'); $('#filtToggle').setAttribute('aria-expanded', String(f.classList.contains('open'))); };
+  $('#kpi').addEventListener('click', e => {
+    const b = e.target.closest('[data-kpi]'); if (!b) return;
+    const [type, val] = b.dataset.kpi.split(':');
+    if (type === 'status') { R.status = (val && R.status !== val) ? val : ''; if (!val) R.special = ''; }
+    else R.special = R.special === val ? '' : val;
+    R.page = 1; syncFilterControls(); renderKPI(); renderRegistry();
+    $('#registry').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+  const reg = $('#registry');
+  reg.addEventListener('click', e => {
+    const t = e.target;
+    if (t.id === 'selAll') { const list = filteredAssets().slice((R.page - 1) * R.size, R.page * R.size); list.forEach(a => t.checked ? R.sel.add(a.id) : R.sel.delete(a.id)); renderRegistry(); return; }
+    const sel = t.closest('[data-sel]'); if (sel) { sel.checked ? R.sel.add(sel.dataset.sel) : R.sel.delete(sel.dataset.sel); renderRegistry(); return; }
+    if (t.closest('label.chk')) return;
+    const mb = t.closest('[data-menu]'); if (mb) { e.stopPropagation(); openMenu(mb, mb.dataset.menu); return; }
+    const so = t.closest('[data-sort]'); if (so) { const k = so.dataset.sort; if (R.sort === k) R.dir = -R.dir; else { R.sort = k; R.dir = 1; } renderRegistry(); return; }
+    const bk = t.closest('[data-bulk]'); if (bk) { if (bk.dataset.bulk === 'clear') { R.sel.clear(); renderRegistry(); } else openBulk(bk.dataset.bulk); return; }
+    const pg = t.closest('[data-page]'); if (pg) { R.page = +pg.dataset.page; renderRegistry(); return; }
+    const ch = t.closest('[data-chip]'); if (ch) { R[ch.dataset.chip] = ''; syncFilterControls(); renderKPI(); renderRegistry(); return; }
+    const row = t.closest('[data-open]'); if (row && !t.closest('input,button,select,a')) openAsset(row.dataset.open);
+  });
+  reg.addEventListener('keydown', e => { if (e.key === 'Enter') { const row = e.target.closest('[data-open]'); if (row && e.target === row) openAsset(row.dataset.open); } });
+  reg.addEventListener('change', e => { if (e.target.id === 'pgSize') { R.size = +e.target.value; R.page = 1; renderRegistry(); } });
+  $('#menu').addEventListener('click', e => { const b = e.target.closest('[data-mact]'); if (!b) return; const id = $('#menu').dataset.id; closeMenu(); b.dataset.mact === 'open' ? openAsset(id) : openOp(id, b.dataset.mact); });
+  $('#menu').addEventListener('keydown', e => { if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); const bs = [...$('#menu').querySelectorAll('button')]; const i = bs.indexOf(document.activeElement); bs[(i + (e.key === 'ArrowDown' ? 1 : -1) + bs.length) % bs.length].focus(); } });
+  document.addEventListener('click', e => { if (!e.target.closest('#menu')) closeMenu(); closeAllMsel(); if (!e.target.closest('.gsearch')) $('#gres').hidden = true; });
+  window.addEventListener('scroll', closeMenu, true);
+  window.addEventListener('resize', closeMenu);
+  // Карточка
+  $('#overlay').onclick = closeDrawer;
+  $('#drawer').addEventListener('click', e => {
+    if (e.target.closest('[data-drclose]')) return closeDrawer();
+    const tb = e.target.closest('[data-tab]'); if (tb) { DR.tab = tb.dataset.tab; renderDrawer(); return; }
+    const op = e.target.closest('[data-op]'); if (op) return openOp(DR.id, op.dataset.op);
+    if (e.target.closest('[data-storno]')) openStorno(DR.id);
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    const mr = $('#modalRoot'); if (mr.lastElementChild) { mr.lastElementChild.close(); return; }
+    if (!$('#menu').hidden) { closeMenu(); return; }
+    if (DR.id) closeDrawer();
+  });
+  // Глобальный поиск (поддерживает USB-сканер: ввод + Enter)
+  const gq = $('#gq'), gres = $('#gres');
+  const gFind = q => { q = q.trim().toLowerCase(); if (!q) return []; return S.assets.filter(a => a.inventory_number.includes(q) || (a.serial_number || '').toLowerCase().includes(q)).sort((a, b) => ((b.inventory_number === q || (b.serial_number || '').toLowerCase() === q) - (a.inventory_number === q || (a.serial_number || '').toLowerCase() === q)) || a.inventory_number.localeCompare(b.inventory_number)).slice(0, 8); };
+  gq.addEventListener('input', () => {
+    const res = gFind(gq.value); if (!gq.value.trim()) { gres.hidden = true; return; }
+    gres.innerHTML = res.length ? res.map(a => `<button type="button" data-gid="${a.id}"><span class="mono">${esc(a.inventory_number)}</span> · ${esc(a.name)}<div class="sub">${a.serial_number ? 'S/N ' + esc(a.serial_number) + ' · ' : ''}${STATUSES[a.status].label}</div></button>`).join('') : '<div class="empty">Ничего не найдено</div>';
+    gres.hidden = false;
+  });
+  gq.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { const r = gFind(gq.value); if (r[0]) { openAsset(r[0].id); gq.value = ''; gres.hidden = true; } else toast('Актив не найден', true); }
+    if (e.key === 'ArrowDown') { const b = gres.querySelector('button'); if (b) { e.preventDefault(); b.focus(); } }
+  });
+  gres.addEventListener('click', e => { const b = e.target.closest('[data-gid]'); if (b) { openAsset(b.dataset.gid); gq.value = ''; gres.hidden = true; } });
+  // Отчёт
+  $('#rpFrom').addEventListener('change', e => { RP.from = e.target.value; RP.preset = ''; document.querySelectorAll('[data-preset]').forEach(b => b.setAttribute('aria-pressed', 'false')); renderReport(); });
+  $('#rpTo').addEventListener('change', e => { RP.to = e.target.value; RP.preset = ''; document.querySelectorAll('[data-preset]').forEach(b => b.setAttribute('aria-pressed', 'false')); renderReport(); });
+  $('#rpTo').max = TODAY; $('#rpFrom').max = TODAY;
+  document.querySelectorAll('[data-preset]').forEach(b => b.onclick = () => { setPreset(b.dataset.preset); renderReport(); });
+  $('#rpGo').onclick = () => { if (renderReport()) toast('Отчёт сформирован'); };
+  [['rpDept', 'dept'], ['rpLoc', 'loc'], ['rpCat', 'cat'], ['rpDepr', 'depr']].forEach(([id, k]) => $('#' + id).addEventListener('change', e => { RP[k] = e.target.value; renderReport(); }));
+  msel($('#rpTypes'), { options: USER_OPS.concat(['register', 'storno']).map(o => [o, OPS[o].label]), selected: RP.types, summary: s => s.size ? `Операции: ${s.size}` : 'Операции: все', onChange: reportChanged });
+  msel($('#rpCols'), { options: RCOLS.map(c => [c.k, c.label, c.req]), selected: RP.visible, summary: () => 'Колонки', onChange: reportChanged });
+  $('#exCsv').onclick = exportCsv; $('#exXlsx').onclick = exportXlsx; $('#exPdf').onclick = exportPdf; $('#exPrint').onclick = doPrint;
+}
+
+/* ---------- Запуск ---------- */
+load();
+buildRegHead();
+bindEvents();
+setPreset('month');
+refreshFilterOptions();
+renderKPI();
+renderRegistry();
+renderReport();
+</script>
+</body>
+</html>
